@@ -1,0 +1,11 @@
+Faction;Name;Special;Defense
+Orc Marauders;Cyborg Body;Regeneration;
+Orc Marauders;Heavy Armor;;1
+Orc Marauders;Power Armor;Slow, Tough(3);2
+Orc Marauders;Precision Monocle;Good Shot;
+Orc Marauders;Orc Herder;Fearless;
+Battle Brothers;Jetpack;Ambush,Flying;
+Battle Brothers;Destroyer Armor;Ambush,Tough(+3);
+Battle Brothers;Blessed Halo;Tough(+3);
+Battle Brothers;Stealth Cloak;Stealth;
+Battle Brothers;Combat Shield;Shield Wall;

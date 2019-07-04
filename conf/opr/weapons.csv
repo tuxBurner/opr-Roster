@@ -1,0 +1,66 @@
+Faction;Name;Range;Attacks;Armorpircing;Special;Linked Name
+Orc Marauders;Pistol;12;1;;;
+Orc Marauders;CCW3;;3;;;
+Orc Marauders;CCW2;;2;;;
+Orc Marauders;Energy Staff;;2;1;;
+Orc Marauders;Syringe;;2;;Poison;
+Orc Marauders;Pistols;12;1;;;
+Orc Marauders;CCWs;;1;;;
+Orc Marauders;Flamethrower;12;6;;;
+Orc Marauders;Boarding Gun;24;3;1;;
+Orc Marauders;Carbine;18;2;;;
+Orc Marauders;Energy Fist;;3;2;;
+Orc Marauders;Twin Mini-MG;18;6;1;;
+Orc Marauders;3x Twin Shotguns;12;4;;;
+Orc Marauders;Custom Plasma Rifle;24;1;3;;
+Orc Marauders;Twin Carbiner;18;4;;;
+Orc Marauders;Energy Sword;;3;1;;
+Orc Marauders;Heavy Flamethrower;12;6;1;;
+Orc Marauders;Rocket Launcher;24;1;3;Deadly(3);
+Orc Marauders;Attack Beast;;1;1;;
+Orc Marauders;Custom Plasma Pistol;12;1;3;;
+Orc Marauders;Teleport Pistol;12;1;3;Blast(3),Rending;
+Orc Marauders;Shock Gun;48;1;D3+1;Blast(6);
+Orc Marauders;Sawblade;;3;4;;
+Orc Marauders;Railgun;48;2;2;;
+Orc Marauders;Bomb Hammer;;1;4;Deadly(6);
+Orc Marauders;Bomb Beasts;18;1;2;Blast(3);
+Orc Marauders;Heavy Machinegun;36;3;1;;
+Orc Marauders;2x Sawblades;;3;4;;
+Orc Marauders;Twin Rocket Launcher;24;2;3;Deadly(3);
+Orc Marauders;Twin Heavy Machinegun;36;6;1;;
+Orc Marauders;Sawblade L;;1;4;;
+Orc Marauders;Assault Bombs;;1;;Blast(6);
+Orc Marauders;Energy Sword M;;2;1;;
+Orc Marauders;Energy Fist M;;2;2;;
+Battle Brothers;Assault Rifle;24;1;;;
+Battle Brothers;CCW ;;1;;;
+Battle Brothers;Pistol;12;1;;;
+Battle Brothers;Energy Fist;;2;2;;
+Battle Brothers;CCW2;;2;;;
+Battle Brothers;Heavy Flamethrower;12;6;1;;
+Battle Brothers;Storm Rifle;24;2;;;
+Battle Brothers;Twin Assault Rifle;24;2;;;
+Battle Brothers;Heavy Machinegun;36;3;1;;
+Battle Brothers;Gravity Pistol;12;1;;Rending;
+Battle Brothers;Plasma Pistol;12;1;2;;
+Battle Brothers;Energy Sword;;2;1;;
+Battle Brothers;Gravity Rifle;18;1;;Rending;
+Battle Brothers;Plasma Rifle;24;1;2;;
+Battle Brothers;Flamethrower;12;6;;;
+Battle Brothers;Fusion Rifle;12;1;4;Deadly(6);
+Battle Brothers;Plasma Canon;36;1;2;Blast(3);
+Battle Brothers;Missile Launcher HE;48;1;;PickOneEachTurn,Blast(3);Missile Launcher
+Battle Brothers;Missile Launcher AT;48;1;3;PickOneEachTurn,Deadly(3);Missile Launcher
+Battle Brothers;Heavy Fusion Rifle;24;1;4;Deadly(6);
+Battle Brothers;Laser Canon;48;1;4;Deadly(3);
+Battle Brothers;Shotgun;12;2;;;
+Battle Brothers;Sniper Rifle;36;1;1;Sniper;
+Battle Brothers;2x Energy Claws;;2;1;Rending;
+Battle Brothers;Energy Hammer;;2;3;;
+Battle Brothers;Minigun;24;4;1;Rending;
+Battle Brothers;Cyclone Missiles HE;48;2;;PickOneEachTurn,Blast(3);Cyclone Missiles
+Battle Brothers;Cyclone Missiles AT;48;2;3;PickOneEachTurn,Deadly(3);Cyclone Missiles
+Battle Brothers;Grenade Launcher HE;24;1;;PickOneEachTurn,Blast(3);Grenade Launcher
+Battle Brothers;Grenade Launcher AT;24;1;1;PickOneEachTurn;Grenade Launcher
+Battle Brothers;Gravity Cannon;24;1;;Blast(3), Rending;
