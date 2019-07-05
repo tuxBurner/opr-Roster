@@ -50,4 +50,55 @@ object CSVHeaders {
     * Header column of costs in the csv
     */
   val COST_HEADER = "Costs"
+
+  /**
+    * Header column of attacks in the csv
+    */
+  val ATTACKS_HEADER = "Attacks"
+
+  /**
+    * Header column of range in the csv
+    */
+  val RANGE_HEADER = "Range"
+
+  /**
+    * Header column of armor piercing in the csv
+    */
+  val ARMOR_PIERCING_HEADER = "Armorpiercing"
+
+  /**
+    * Header column of linked name in the csv
+    */
+  val LINKED_NAME_HEADER = "Linked Name"
+
+  /**
+    * Header column of rule in the csv
+    */
+  val RULE_HEADER = "Rule"
+
+  /**
+    * Header column of subject in the csv
+    */
+  val SUBJECTS_HEADER = "Subjects"
+
+  /**
+    * Header column of amount in the csv
+    */
+  val AMOUNT_HEADER = "Amount"
+
+  /**
+    * Header column of with in the csv
+    */
+  val WITH_HEADER = "With"
+
+  /**
+    * Header column of with type in the csv
+    */
+  val WITH_TYPE_HEADER = "With Type"
+
+
+
+
+
+
 }

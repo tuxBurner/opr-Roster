@@ -1,4 +1,4 @@
-Faction;Name;Range;Attacks;Armorpircing;Special;Linked Name
+Faction;Name;Range;Attacks;Armorpiercing;Abilities;Linked Name
 Orc Marauders;Pistol;12;1;;;
 Orc Marauders;CCW3;;3;;;
 Orc Marauders;CCW2;;2;;;

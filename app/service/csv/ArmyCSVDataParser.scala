@@ -1,13 +1,11 @@
 package service.csv
 
 import javax.inject.{Inject, Singleton}
-import org.apache.commons.lang3.StringUtils
 import play.api.Configuration
 
 /**
+  * Parses the armies to factions and there troops from the armies csv
   * @author Sebastian Hardt (s.hardt@micromata.de)
-  *         Date: 02.07.19
-  *         Time: 19:00
   */
 @Singleton
 class ArmyCSVDataParser @Inject()(configuration: Configuration) extends CSVDataParser[Set[CSVFactionDto]](configuration) {
@@ -16,12 +14,11 @@ class ArmyCSVDataParser @Inject()(configuration: Configuration) extends CSVDataP
 
   override def getFileName(): String = "armies"
 
-  override def readCsvDataInternal(dataFromCsvFile: List[Map[String, String]]): Set[CSVFactionDto] = {
+  override def readCsvDataInternal(dataFromCsvFile: List[(Map[String, String], Int)]): Set[CSVFactionDto] = {
 
 
     val troops =
       dataFromCsvFile
-        .zipWithIndex
         .filter(info => filterRequiredLines(requiredHeaders, info))
         .flatMap(info => {
 
@@ -35,7 +32,7 @@ class ArmyCSVDataParser @Inject()(configuration: Configuration) extends CSVDataP
           val upgrades = readCsvLineToSet(CSVHeaders.UPGRADES_HEADER, info)
           val costs = readCsvLineToInt(CSVHeaders.COST_HEADER, info)
 
-          if(costs.isEmpty || defence.isEmpty || quality.isEmpty || size.isEmpty) {
+          if (costs.isEmpty || defence.isEmpty || quality.isEmpty || size.isEmpty) {
             None
           } else {
 
@@ -62,47 +59,30 @@ class ArmyCSVDataParser @Inject()(configuration: Configuration) extends CSVDataP
       .toSet
   }
 
-  private def filterRequiredLines(requiredColumns: Set[String], csvInfo: (Map[String, String], Int)): Boolean = {
-    requiredColumns.forall(colum => {
-      val colVal = csvInfo._1.get(colum)
-      if (colVal.isEmpty || StringUtils.isBlank(colVal.get)) {
-        LOGGER.error(s"Line ${csvInfo._1.values.mkString} in armies.csv: ${csvInfo._2} has no value at column ${colum} set")
-        false
-      } else {
-        true
-      }
-    })
-  }
-
-  private def readCsvLineToInt(csvHeader: String, csvInfo: (Map[String, String], Int)): Option[Int] = {
-    val stringVal = csvInfo._1.get(csvHeader)
-    if (stringVal.isEmpty) {
-      return None
-    }
-
-    try {
-      Some(stringVal.get.toInt)
-    } catch {
-      case e: Exception => {
-        LOGGER.error(s"Line in armies.csv: ${csvInfo._2} from colum ${csvHeader} value: ${stringVal.get} is not a number ")
-        None
-      }
-    }
-  }
-
-  private def readCsvLineToSet(csvHeader: String, csvInfo: (Map[String, String], Int)): Set[String] = {
-    csvInfo._1.get(csvHeader)
-      .map(_.trim.split(",").toSet)
-      .getOrElse({
-        Set.empty
-      })
-  }
-
 }
 
+/**
+  * Represents a faction from the armies.csv
+  *
+  * @param name   name of the faction
+  * @param troops troops which are in the faction
+  */
 case class CSVFactionDto(name: String,
                          troops: Set[CSVTroopDto])
 
+/**
+  * Represents a troop from the armies.csv
+  *
+  * @param name             the name of the troop
+  * @param factionName      the name of the faction the troop belongs to
+  * @param size             the size of the troop
+  * @param quality          the quality of the troop
+  * @param defence          the defence of the troop
+  * @param defaultEquipment the default equipment the troop has
+  * @param defaultAbilities the default abilities the troop has
+  * @param upgrades         the upgrades the troop can have
+  * @param costs            the costs of the troop
+  */
 case class CSVTroopDto(name: String,
                        factionName: String,
                        size: Int,

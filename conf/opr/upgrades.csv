@@ -1,4 +1,4 @@
-Faction;Upgrade;Rule;Subject;Amount;With;With Type;Cost
+Faction;Upgrades;Rule;Subjects;Amount;With;With Type;Costs
 Orc Marauders;A;Replace;Pistol;;Carbine;W;5
 Orc Marauders;A;;;;Twin Carbine;W;10
 Orc Marauders;A;Replace;CCW;;CCW3;W;5
