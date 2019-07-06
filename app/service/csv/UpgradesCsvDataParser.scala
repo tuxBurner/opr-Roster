@@ -71,7 +71,6 @@ class UpgradesCsvDataParser @Inject()(configuration: Configuration) extends CSVD
         CSVUpgradeDto(name = updateName,
           factionName = faction,
           rules = rulesDto)
-
       })
     })
 

@@ -96,6 +96,11 @@ object CSVHeaders {
     */
   val WITH_TYPE_HEADER = "With Type"
 
+  /**
+    * Header column of modifier in the csv
+    */
+  val MODIFIER_HEADER = "Modifier"
+
 
 
 

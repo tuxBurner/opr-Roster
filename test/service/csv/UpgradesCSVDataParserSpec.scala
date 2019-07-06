@@ -19,8 +19,10 @@ class UpgradesCSVDataParserSpec extends PlaySpec with GuiceOneAppPerTest with In
 
   "UpgradesCsvDataParser" should {
     "parse csv" in {
-      val weaponCsvData = upgradesCsvDataParser.parseData()
-      weaponCsvData.isEmpty mustBe false
+      val upgradesCsvData = upgradesCsvDataParser.parseData()
+      upgradesCsvData.isEmpty mustBe false
+      val upgrades = upgradesCsvData.get
+      upgrades.size > 0 mustBe true
     }
   }
 
