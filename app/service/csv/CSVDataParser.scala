@@ -109,7 +109,7 @@ abstract class CSVDataParser[A](configuration: Configuration) {
     requiredColumns.forall(column => {
       val colVal = csvInfo._1.get(column)
       if (colVal.isEmpty || StringUtils.isBlank(colVal.get)) {
-        LOGGER.error(s"Line ${csvInfo._1.values.mkString} in $getFileName().csv: ${csvInfo._2} has no value at column ${column} set")
+        LOGGER.error(s"Line ${csvInfo._1.values.mkString} in $getFileName.csv: ${csvInfo._2} has no value at column ${column} set")
         false
       } else {
         true
@@ -137,7 +137,7 @@ abstract class CSVDataParser[A](configuration: Configuration) {
     } catch {
       case e: Exception => {
         if (logError) {
-          LOGGER.error(s"Line in $getFileName().csv: ${csvInfo._2} from colum ${csvColumn} value: ${stringVal.get} is not a number ")
+          LOGGER.error(s"Line in $getFileName.csv: ${csvInfo._2} from colum ${csvColumn} value: ${stringVal.get} is not a number ")
         }
         None
       }

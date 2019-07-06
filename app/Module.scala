@@ -1,5 +1,5 @@
 import com.google.inject.AbstractModule
-import service.DataInitiakizer
+import service.DataInitializer
 import service.csv.{AbilitiesCsvDataParser, ArmyCSVDataParser, UpgradesCsvDataParser, WeaponCsvDataParser}
 
 /**
@@ -13,7 +13,7 @@ class Module extends AbstractModule {
     bind(classOf[WeaponCsvDataParser]).asEagerSingleton()
     bind(classOf[UpgradesCsvDataParser]).asEagerSingleton()
     bind(classOf[AbilitiesCsvDataParser]).asEagerSingleton()
-    bind(classOf[DataInitiakizer]).asEagerSingleton()
+    bind(classOf[DataInitializer]).asEagerSingleton()
   }
 
 }

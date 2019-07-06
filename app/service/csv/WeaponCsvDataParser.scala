@@ -33,6 +33,9 @@ class WeaponCsvDataParser @Inject()(configuration: Configuration) extends CSVDat
           if(attacks.isEmpty) {
             None
           } else {
+
+            val linkedNameVal = if(linkedName.getOrElse("").isEmpty) name.get else linkedName.get
+
             val weapons = CSVWeaponDto(
               name = name.get,
               factionName = factionName.get,
@@ -40,7 +43,7 @@ class WeaponCsvDataParser @Inject()(configuration: Configuration) extends CSVDat
               attacks = attacks.get,
               armorPiercing = armorPiercing,
               abilities = abilities,
-              linkedName = linkedName.getOrElse(name.get)
+              linkedName = linkedNameVal
             )
             Some(weapons)
           }

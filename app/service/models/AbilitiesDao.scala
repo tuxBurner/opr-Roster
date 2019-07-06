@@ -11,7 +11,10 @@ import scala.collection.mutable.ListBuffer
   */
 object AbilitiesDao {
 
-  val abilities: ListBuffer[AbilityDo] = ListBuffer()
+  /**
+    * All the abilities
+    */
+  private val abilities: ListBuffer[AbilityDo] = ListBuffer()
 
   private val LOGGER = Logger("AbilitiesDao")
 
@@ -43,6 +46,59 @@ object AbilitiesDao {
       .find(_.name == abilityName)
   }
 
+  /**
+    * Deletes all abilities
+    */
+  def deleteAll(): Unit = {
+    abilities.clear()
+  }
+
+
+  /**
+    * This splits an ability with Name(Val)
+    *
+    * @param abilityString the ability string to split
+    * @return (name,modifyValue)
+    */
+  //TODO: in a helper ?
+  def parseAbilityString(abilityString: String): (String, Option[Int]) = {
+    val splitAbility = abilityString.split('(')
+    val cleanAbilityName = splitAbility(0)
+    val abilityModifier = if (splitAbility.length == 2) {
+      Some(splitAbility(1).replace(")", "").toInt)
+    } else {
+      None
+    }
+
+    (cleanAbilityName, abilityModifier)
+  }
+
+  /**
+    * Gets the abilities from the csv string
+    * @param abilitiesFromCsv the strings from the csv
+    * @param errorLog the logging callback
+    * @return [[Set]] of [[AbilityWithModifyValueDo]]
+    */
+  def findAbilitiesForCsv(abilitiesFromCsv: Set[String], errorLog: (String) => Unit) : Set[AbilityWithModifyValueDo] = {
+    abilitiesFromCsv.flatMap(
+      abilityName => {
+
+        if(abilityName.isEmpty) {
+          None
+        } else {
+          val parsedAbilityString = AbilitiesDao.parseAbilityString(abilityName)
+          val abilityOption = AbilitiesDao.findAbilityByName(parsedAbilityString._1)
+          abilityOption
+            .map(ability => Some(AbilityWithModifyValueDo(ability = ability, modifyValue = parsedAbilityString._2)))
+            .getOrElse({
+              errorLog(parsedAbilityString._1)
+              None
+            })
+        }
+      }
+    )
+  }
+
 }
 
 /**
@@ -53,3 +109,12 @@ object AbilitiesDao {
   */
 case class AbilityDo(name: String,
                      modifier: Boolean)
+
+/**
+  * Represents an ability with its modify value
+  *
+  * @param ability     the ability itself
+  * @param modifyValue the value to modify
+  */
+case class AbilityWithModifyValueDo(ability: AbilityDo,
+                                    modifyValue: Option[Int])

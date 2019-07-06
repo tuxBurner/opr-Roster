@@ -33,18 +33,14 @@ object WeaponDao {
     if (alreadyExists) {
       LOGGER.error(s"Cannot add weapon: ${csvWeaponDto.linkedName}/${csvWeaponDto.name} to faction: ${csvWeaponDto.factionName} it already exists")
     } else {
-      val factionDo = FactionDao.findFactionByName(csvWeaponDto.factionName)
+      val factionDo = FactionsDao.findFactionByName(csvWeaponDto.factionName)
       if (factionDo.isEmpty) {
         LOGGER.error(s"Cannot add weapon: ${csvWeaponDto.linkedName}/${csvWeaponDto.name} to faction: ${csvWeaponDto.factionName} faction not found")
       } else {
         LOGGER.info(s"Adding new weapon: ${csvWeaponDto.linkedName}/${csvWeaponDto.name} to faction: ${csvWeaponDto.factionName}")
 
-        val abilities = csvWeaponDto.abilities.flatMap(csvAbility => {
-          val abilityDo = AbilitiesDao.findAbilityByName(csvAbility)
-          if (abilityDo.isEmpty) {
-            LOGGER.error(s"Cannot find ability: $csvAbility for weapon: ${csvWeaponDto.linkedName}/${csvWeaponDto.name} faction: ${csvWeaponDto.factionName}")
-          }
-          abilityDo
+        val abilities = AbilitiesDao.findAbilitiesForCsv(csvWeaponDto.abilities,(abilityName) => {
+          LOGGER.error(s"Cannot find ability: ${abilityName} for weapon: ${csvWeaponDto.linkedName}/${csvWeaponDto.name} faction: ${csvWeaponDto.factionName}")
         })
 
         val weaponDo = WeaponDo(name = csvWeaponDto.name,
@@ -57,7 +53,27 @@ object WeaponDao {
 
         weapons += weaponDo
       }
-    }.
+    }
+  }
+
+  /**
+    * Gets all the weapons which match the linked name and the faction name
+    *
+    * @param linkedName  the linked name of the weapon
+    * @param factionName the faction name
+    * @return [[Set]] of [[WeaponDo]]
+    */
+  def findWeaponByLinkedNameAndFactionName(linkedName: String, factionName: String): Set[WeaponDo] = {
+    weapons
+      .filter(weapon => weapon.linkedName == linkedName && weapon.faction.name == factionName)
+      .toSet
+  }
+
+  /**
+    * Deletes all weapons
+    */
+  def deletAll(): Unit = {
+    weapons.clear()
   }
 }
 
@@ -78,6 +94,6 @@ case class WeaponDo(name: String,
                     range: Int,
                     attacks: Int,
                     armorPiercing: Int,
-                    abilities: Set[AbilityDo])
+                    abilities: Set[AbilityWithModifyValueDo])
 
 

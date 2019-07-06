@@ -9,8 +9,11 @@ import scala.collection.mutable.ListBuffer
   *
   * @author Sebastian Hardt (s.hardt@micromata.de)
   */
-object FactionDao {
+object FactionsDao {
 
+  /**
+    * All the factions
+    */
   private val LOGGER = Logger("FactionDao")
 
   private val factions: ListBuffer[FactionDo] = ListBuffer()
@@ -39,6 +42,25 @@ object FactionDao {
     factions
       .find(_.name.equals(factionName))
   }
+
+  /**
+    * Returns all factions ordered by there name
+    * @return
+    */
+  def getAllFactionNamesOrderd(): List[String] = {
+    factions
+      .map(_.name)
+      .sorted
+      .toList
+  }
+
+  /**
+    * Deletes all factions
+    */
+  def deleteAll() : Unit = {
+    factions.clear()
+  }
+
 
 }
 
