@@ -6,7 +6,7 @@ Orc Marauders;A;;;;Energy Sword;W;10
 Orc Marauders;A;;;;Energy Fist;W;15
 Orc Marauders;A;Attachement;Carbine;1;Heavy Flamethrower;W;15
 Orc Marauders;A;;;;Rocket Launcher;W;15
-Orc Marauders;B;Upgrade any;;;Attack Beast;W;5
+Orc Marauders;B;Upgrade;;;Attack Beast;W;5
 Orc Marauders;B;;;;Cyborg Body;I;20
 Orc Marauders;B;Upgrade;;1;Heavy Armor;I;5
 Orc Marauders;B;;;;Power Armor;I;95
@@ -43,7 +43,7 @@ Orc Marauders;K;Attachement;Carbine;1;Heavy Flamethrower;W;15
 Orc Marauders;K;;;;Rocket Launcher;W;15
 Orc Marauders;L;Replace;Custom Plasma Rifle;;Twin Rocket Launcher;W;15
 Orc Marauders;L;;;;Twin Heavy Machinegun;W;20
-Orc Marauders;L;Upgrade any;;;Sawblade L;W;5
+Orc Marauders;L;Upgrade;;;Sawblade L;W;5
 Orc Marauders;L;;;;Assault Bombs;W;10
 Orc Marauders;M;Replace;CCW;;Energy Sword;W;5
 Orc Marauders;M;;;;Energy Fist;W;10
@@ -53,63 +53,63 @@ Orc Marauders;O;Upgrade;;1;Heavy Armor;I;5
 Orc Marauders;O;Replace;Pistol;;Carbine;W;5
 Orc Marauders;O;;;;Rocket Launcher;W;10
 Orc Marauders;O;;;;Heavy Machinegun;W;15
-Battl Brothers;A;Replace;Assault Rifle,CCW;;Pistol,CCW2;W,W;0
-Battl Brothers;A;Replace;Pistol;;Gravity Pistol;W;5
-Battl Brothers;A;;;;Plasma Pistol;W;5
-Battl Brothers;A;;;;Storm Rifle;W;5
-Battl Brothers;A;Replace;CCW;;Energy Sword;W;5
-Battl Brothers;A;;;;Energy Fist;W;10
-Battl Brothers;A;Attachement;Assault Rifle;1;Gravity Rifle;W;10
-Battl Brothers;A;;;;Plasma Rifle;W;15
-Battl Brothers;A;;;;Flamethrower;W;15
-Battl Brothers;A;;;;Fusion Rifle;W;25
-Battl Brothers;B;Upgrade;;1;Jetpack;I;15
-Battl Brothers;B;;;;Destroyer Armor;I;70
-Battl Brothers;B;Upgrade;;1;Veteran Infantery;A;15
-Battl Brothers;C;Upgrade;;1;Advanced Tactics;A;130
-Battl Brothers;C;Upgrade;;1;Blessed Halo;I;60
-Battl Brothers;D;Upgrade;;1;Psychic(2);A;10
-Battl Brothers;E;Upgrade;;1;Veteran Infantery;A;15
-Battl Brothers;E;Upgrade;;1;Battle Standard;A;10
-Battl Brothers;E;;;;Medical Training;A;45
-Battl Brothers;E;Replace;Assault Rifle;;Gravity Rifle;W;5
-Battl Brothers;E;;;;Plasma Rifle;W;5
-Battl Brothers;E;;;;Flamethrower;W;10
-Battl Brothers;E;;;;Heavy Flamethrower;W;15
-Battl Brothers;E;;;;Gravity Cannon;W;15
-Battl Brothers;E;;;;Fusion Rifle;W;20
-Battl Brothers;E;;;;Heavy Machinegun;W;25
-Battl Brothers;E;;;;Plasma Cannon;W;30
-Battl Brothers;E;;;;Missile Launcher;W;35
-Battl Brothers;E;;;;Heavy Fusion Rifle;W;45
-Battl Brothers;E;;;;Laser Cannon;W;45
-Battl Brothers;F;Upgrade any;;;Veteran Infantery;A;15
-Battl Brothers;F;;;;Jetpack;I;15
-Battl Brothers;F;Replace;Pistol;;Plasma Pistol;W;5
-Battl Brothers;F;;;;Flamethrower;W;10
-Battl Brothers;G;Upgrade;;1;Stealth Cloak;I;5
-Battl Brothers;G;Replace;Assault Rifle,CCW;;Pistol,CCW2;W,W;0
-Battl Brothers;G;;;;Shotgun,CCW;W,W;0
-Battl Brothers;G;;;;Sniper Rifle,CCW;W,W;
-Battl Brothers;G;Replace;Assault Rifle;;Heavy Machinegun;W;25
-Battl Brothers;G;;;;Missile Launcher;W;35
-Battl Brothers;H;Replace;Storm Rifle, Energy Fist;;2x Energy Claws;W;5
-Battl Brothers;H;;;;Energy Hammer, Combat Shield;W,I;5
-Battl Brothers;H;Replace;Storm Rifle;;Heavy Flamethrower;W;0
-Battl Brothers;H;;;;Minigun;W;30
-Battl Brothers;H;Upgrade;;1;Cyclone Missiles;W;80
-Battl Brothers;H;Replace;Energy Fist;;Energy Sword;W;-5
-Battl Brothers;I;Upgrade;;1;War Chant;A;10
-Battl Brothers;J;Upgrade;;1;Gravity Rifle;W;5
-Battl Brothers;J;;;;Plasma Rifle;W;5
-Battl Brothers;J;;;;Flamethrower;W;10
-Battl Brothers;J;;;;Fusion Rifle;W;20
-Battl Brothers;J;Upgrade;;1;Assault Rifle;W;5
-Battl Brothers;K;Replace;Twin Assault Rifle;;Grenade Launcher;W;5
-Battl Brothers;K;Upgrade;;1;Assault Rifle;W;5
-Battl Brothers;L;Replace;Heavy Machinegun;;Heavy Fusion Rifle;W;20
-Battl Brothers;M;Replace;Heavy Flamethrower;;Gravity Cannon;W;0
-Battl Brothers;M;;;;Heavy Machinegun;W;10
-Battl Brothers;M;;;;Plasma Cannon;W;20
-Battl Brothers;M;;;;Missile Launcher;W;20
-Battl Brothers;M;;;;Heavy Fusion Rifle;W;30
+Battle Brothers;A;Replace;Assault Rifle,CCW;;Pistol,CCW2;W,W;0
+Battle Brothers;A;Replace;Pistol;;Gravity Pistol;W;5
+Battle Brothers;A;;;;Plasma Pistol;W;5
+Battle Brothers;A;;;;Storm Rifle;W;5
+Battle Brothers;A;Replace;CCW;;Energy Sword;W;5
+Battle Brothers;A;;;;Energy Fist;W;10
+Battle Brothers;A;Attachement;Assault Rifle;1;Gravity Rifle;W;10
+Battle Brothers;A;;;;Plasma Rifle;W;15
+Battle Brothers;A;;;;Flamethrower;W;15
+Battle Brothers;A;;;;Fusion Rifle;W;25
+Battle Brothers;B;Upgrade;;1;Jetpack;I;15
+Battle Brothers;B;;;;Destroyer Armor;I;70
+Battle Brothers;B;Upgrade;;1;Veteran Infantery;A;15
+Battle Brothers;C;Upgrade;;1;Advanced Tactics;A;130
+Battle Brothers;C;Upgrade;;1;Blessed Halo;I;60
+Battle Brothers;D;Upgrade;;1;Psychic(2);A;10
+Battle Brothers;E;Upgrade;;1;Veteran Infantery;A;15
+Battle Brothers;E;Upgrade;;1;Battle Standard;A;10
+Battle Brothers;E;;;;Medical Training;A;45
+Battle Brothers;E;Replace;Assault Rifle;;Gravity Rifle;W;5
+Battle Brothers;E;;;;Plasma Rifle;W;5
+Battle Brothers;E;;;;Flamethrower;W;10
+Battle Brothers;E;;;;Heavy Flamethrower;W;15
+Battle Brothers;E;;;;Gravity Cannon;W;15
+Battle Brothers;E;;;;Fusion Rifle;W;20
+Battle Brothers;E;;;;Heavy Machinegun;W;25
+Battle Brothers;E;;;;Plasma Cannon;W;30
+Battle Brothers;E;;;;Missile Launcher;W;35
+Battle Brothers;E;;;;Heavy Fusion Rifle;W;45
+Battle Brothers;E;;;;Laser Cannon;W;45
+Battle Brothers;F;Upgrade;;;Veteran Infantery;A;15
+Battle Brothers;F;;;;Jetpack;I;15
+Battle Brothers;F;Replace;Pistol;;Plasma Pistol;W;5
+Battle Brothers;F;;;;Flamethrower;W;10
+Battle Brothers;G;Upgrade;;1;Stealth Cloak;I;5
+Battle Brothers;G;Replace;Assault Rifle,CCW;;Pistol,CCW2;W,W;0
+Battle Brothers;G;;;;Shotgun,CCW;W,W;0
+Battle Brothers;G;;;;Sniper Rifle,CCW;W,W;15
+Battle Brothers;G;Replace;Assault Rifle;;Heavy Machinegun;W;25
+Battle Brothers;G;;;;Missile Launcher;W;35
+Battle Brothers;H;Replace;Storm Rifle, Energy Fist;;2x Energy Claws;W;5
+Battle Brothers;H;;;;Energy Hammer, Combat Shield;W,I;5
+Battle Brothers;H;Replace;Storm Rifle;;Heavy Flamethrower;W;0
+Battle Brothers;H;;;;Minigun;W;30
+Battle Brothers;H;Upgrade;;1;Cyclone Missiles;W;80
+Battle Brothers;H;Replace;Energy Fist;;Energy Sword;W;-5
+Battle Brothers;I;Upgrade;;1;War Chant;A;10
+Battle Brothers;J;Upgrade;;1;Gravity Rifle;W;5
+Battle Brothers;J;;;;Plasma Rifle;W;5
+Battle Brothers;J;;;;Flamethrower;W;10
+Battle Brothers;J;;;;Fusion Rifle;W;20
+Battle Brothers;J;Upgrade;;1;Assault Rifle;W;5
+Battle Brothers;K;Replace;Twin Assault Rifle;;Grenade Launcher;W;5
+Battle Brothers;K;Upgrade;;1;Assault Rifle;W;5
+Battle Brothers;L;Replace;Heavy Machinegun;;Heavy Fusion Rifle;W;20
+Battle Brothers;M;Replace;Heavy Flamethrower;;Gravity Cannon;W;0
+Battle Brothers;M;;;;Heavy Machinegun;W;10
+Battle Brothers;M;;;;Plasma Cannon;W;20
+Battle Brothers;M;;;;Missile Launcher;W;20
+Battle Brothers;M;;;;Heavy Fusion Rifle;W;30

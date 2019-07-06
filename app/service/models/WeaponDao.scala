@@ -39,7 +39,7 @@ object WeaponDao {
       } else {
         LOGGER.info(s"Adding new weapon: ${csvWeaponDto.linkedName}/${csvWeaponDto.name} to faction: ${csvWeaponDto.factionName}")
 
-        val abilities = AbilitiesDao.findAbilitiesForCsv(csvWeaponDto.abilities,(abilityName) => {
+        val abilities = AbilitiesDao.findAbilitiesForCsv(csvWeaponDto.abilities, (abilityName) => {
           LOGGER.error(s"Cannot find ability: ${abilityName} for weapon: ${csvWeaponDto.linkedName}/${csvWeaponDto.name} faction: ${csvWeaponDto.factionName}")
         })
 
@@ -68,6 +68,29 @@ object WeaponDao {
       .filter(weapon => weapon.linkedName == linkedName && weapon.faction.name == factionName)
       .toSet
   }
+
+  /**
+    * Gets the weapons from the csv string
+    *
+    * @param factionName the name of the faction to get the weapons for
+    * @param weaponsFromCsv the strings from the csv
+    * @param errorLog       the logging callback
+    * @return [[Set]] of [[WeaponDo]]
+    */
+  def findWeaponsForCsv(factionName:String,weaponsFromCsv: Set[String], errorLog: (String) => Unit): Set[WeaponDo] = {
+    weaponsFromCsv.flatMap(weaponName => {
+      if (weaponName.isEmpty) {
+        None
+      } else {
+        val weaponDo = WeaponDao.findWeaponByLinkedNameAndFactionName(weaponName.trim, factionName)
+        if (weaponDo.isEmpty) {
+          errorLog(weaponName)
+        }
+        weaponDo
+      }
+    })
+  }
+
 
   /**
     * Deletes all weapons

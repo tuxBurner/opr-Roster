@@ -2,7 +2,7 @@ package service
 
 import javax.inject.{Inject, Singleton}
 import service.csv._
-import service.models.{AbilitiesDao, FactionDo, FactionsDao, TroopDao, WeaponDao}
+import service.models.{AbilitiesDao, FactionDo, FactionsDao, TroopDao, UpgradesDao, WeaponDao}
 
 /**
   * This calls the csv parsers does some checking on it and inserts the data into the daos
@@ -24,13 +24,11 @@ class DataInitializer @Inject()(armiesCsvParser: ArmyCSVDataParser,
     val csvUpgradeInfos = upgradesCsvParser.parseData()
     val csvAbilitiesInfos = abilitiesCsvParser.parseData()
 
-
     addFactions(csvArmyInfos.get)
     addAbilities(csvAbilitiesInfos.get)
     addWeapons(csvWeaponInfos.get)
     addTroops(csvArmyInfos.get)
-
-
+    addUpgrades(csvUpgradeInfos.get)
   }
 
   /**
@@ -47,13 +45,14 @@ class DataInitializer @Inject()(armiesCsvParser: ArmyCSVDataParser,
 
   /**
     * Adds all troops
+    *
     * @param csvFactions the csv factions containing there troops
     */
-  def addTroops(csvFactions: Set[CSVFactionDto]) : Unit = {
+  def addTroops(csvFactions: Set[CSVFactionDto]): Unit = {
     TroopDao.deleteAll()
     csvFactions.foreach(csvFaction => {
       val factionDo = FactionsDao.findFactionByName(csvFaction.name).get
-      addTroopsToFaction(csvFaction.troops,factionDo)
+      addTroopsToFaction(csvFaction.troops, factionDo)
     })
   }
 
@@ -81,10 +80,20 @@ class DataInitializer @Inject()(armiesCsvParser: ArmyCSVDataParser,
   /**
     * Adds the troops to the csv faction
     *
-    * @param csvFaction
+    * @param csvTroops the troops from the csv
+    * @param faction   the faction the troops belong to
     */
   def addTroopsToFaction(csvTroops: Set[CSVTroopDto], faction: FactionDo): Unit = {
-    csvTroops.foreach(TroopDao.addTroopFromCsvDto(_,faction))
+    csvTroops.foreach(TroopDao.addTroopFromCsvDto(_, faction))
+  }
+
+  /**
+    * Adds all the csv upgrades
+    * @param csvUpgrades the csv upgrades
+    */
+  def addUpgrades(csvUpgrades: Set[CSVUpgradeDto]): Unit = {
+    UpgradesDao.deletAll()
+    csvUpgrades.foreach(UpgradesDao.addUpgradeFromCsv) 
   }
 
 }

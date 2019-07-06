@@ -1,12 +1,9 @@
 package service.models
 
-import java.util.regex.Pattern
-
 import play.api.Logger
 import service.csv.CSVTroopDto
 
 import scala.collection.mutable.ListBuffer
-import scala.util.matching.Regex
 
 /**
   * Handles the troop dos
@@ -28,7 +25,7 @@ object TroopDao {
   }
 
   /**
-    * All the factions
+    * Logger
     */
   private val LOGGER = Logger("TroopDao")
 
@@ -54,18 +51,13 @@ object TroopDao {
 
       LOGGER.info(s"Adding troop: ${csvTroop.name} to faction: ${csvTroop.factionName}")
 
-      val abilities = AbilitiesDao.findAbilitiesForCsv(csvTroop.defaultAbilities,(abilityName) => {
+      val abilities = AbilitiesDao.findAbilitiesForCsv(csvTroop.defaultAbilities, (abilityName) => {
         LOGGER.error(s"Cannot find ability: ${abilityName} for troop: ${csvTroop.name} in faction: ${csvTroop.factionName}")
       })
 
-      val weapons = csvTroop.defaultEquipment
-        .flatMap(weaponName => {
-          val weapons = WeaponDao.findWeaponByLinkedNameAndFactionName(weaponName, faction.name)
-          if (weapons.isEmpty) {
-            LOGGER.error(s"Could not find weapon: $weaponName for troop: ${csvTroop.name} in faction: ${csvTroop.factionName}")
-          }
-          weapons
-        })
+      val weapons = WeaponDao.findWeaponsForCsv(faction.name, csvTroop.defaultEquipment, (weaponName) => {
+        LOGGER.error(s"Could not find weapon: $weaponName for troop: ${csvTroop.name} in faction: ${csvTroop.factionName}")
+      })
 
       val newTroop = TroopDo(name = csvTroop.name,
         faction = faction,

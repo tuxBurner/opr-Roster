@@ -23,7 +23,7 @@ class UpgradesCsvDataParser @Inject()(configuration: Configuration) extends CSVD
 
 
     // split the upgrades by
-    val upgrades = split(filteredUpdates, { x: (Map[String, String], Int) => {
+    val upgrades = splitToBlocks(filteredUpdates, { x: (Map[String, String], Int) => {
       val rule = x._1.get(CSVHeaders.RULE_HEADER)
       rule.isDefined && StringUtils.isNotBlank(rule.get)
     }
@@ -58,11 +58,11 @@ class UpgradesCsvDataParser @Inject()(configuration: Configuration) extends CSVD
               upgradeWith.zipWithIndex.map((upgradeWithBlock) => CSVUpgradeWithDTO(withName = upgradeWithBlock._1, withType = upgradeWithType(upgradeWithBlock._2))).toSet
             }
 
-            CSVUpgradeOptionsDto(costs = costs.get,
+            CSVUpgradeOptionDto(costs = costs.get,
               upgradeWith = upgradeWithSet)
           }).toSet
 
-          CSVUpgradeRuleDto(rule = ruleName,
+          CSVUpgradeRuleDto(ruleType = ruleName,
             subjects = subjects,
             amount = amount,
             options = upgradeWiths)
@@ -79,13 +79,25 @@ class UpgradesCsvDataParser @Inject()(configuration: Configuration) extends CSVD
   }
 
 
-  def split[A](list_in: List[A], search: A => Boolean): List[List[A]] = {
+  /**
+    * Splits the given list blockwise
+    * @param originalList
+    * @param search function which returns true for the block start
+    * @tparam A the type parameter to handle
+    * @return [[List]] with the blocks
+    */
+  def splitToBlocks[A](originalList: List[A], search: A => Boolean): List[List[A]] = {
 
-    def split_helper(accum: List[List[A]], list_in2: List[A], search: A => Boolean): List[List[A]] = {
+    /**
+      * Helper for the splitting
+      * @param resultList the list with the blocks to return as the result
+      * @param leftOverList the list to take the next blocks from
+      * @return the list with the blocks
+      */
+    def splitHelper(resultList: List[List[A]], leftOverList: List[A]): List[List[A]] = {
 
-
-      val startLines = list_in2.head
-      val withoutStart = list_in2.drop(1)
+      val startLines = leftOverList.head
+      val withoutStart = leftOverList.drop(1)
 
       val blockLines = withoutStart.takeWhile(search(_) == false)
 
@@ -93,32 +105,55 @@ class UpgradesCsvDataParser @Inject()(configuration: Configuration) extends CSVD
 
       val fullBlockLines = startLines :: blockLines
 
-      val new_accum = accum :+ fullBlockLines
+      val new_accum = resultList :+ fullBlockLines
       if (finalList.length > 0) {
-        split_helper(new_accum, finalList, search)
+        splitHelper(new_accum, finalList)
       } else {
         new_accum
       }
 
     }
 
-    split_helper(List(), list_in, search)
+    splitHelper(List(), originalList)
   }
 
 }
 
 
+/**
+  * An upgrade
+  * @param name the name of the upgrade
+  * @param factionName the name of the faction the upgrade belongs to
+  * @param rules the rules in the upgrade
+  */
 case class CSVUpgradeDto(name: String,
                          factionName: String,
                          rules: Set[CSVUpgradeRuleDto])
 
-case class CSVUpgradeRuleDto(rule: String,
+/**
+  * A Rule for the upgrades
+  * @param ruleType the type of the rule
+  * @param subjects the subjects to apply the rule on
+  * @param amount how many options may be picked
+  * @param options the options which can be selected
+  */
+case class CSVUpgradeRuleDto(ruleType: String,
                              subjects: Set[String],
                              amount: Int,
-                             options: Set[CSVUpgradeOptionsDto])
+                             options: Set[CSVUpgradeOptionDto])
 
-case class CSVUpgradeOptionsDto(costs: Int,
-                                upgradeWith: Set[CSVUpgradeWithDTO])
+/**
+  * An upgrade option
+  * @param costs how much does the upgrade cost
+  * @param upgradeWith with what can the upgrade be used
+  */
+case class CSVUpgradeOptionDto(costs: Int,
+                               upgradeWith: Set[CSVUpgradeWithDTO])
 
+/**
+  * Represents an upgrade with
+  * @param withName the name of the item
+  * @param withType the type of the item
+  */
 case class CSVUpgradeWithDTO(withName: String,
                              withType: String)

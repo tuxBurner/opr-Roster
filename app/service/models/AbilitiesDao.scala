@@ -82,7 +82,6 @@ object AbilitiesDao {
   def findAbilitiesForCsv(abilitiesFromCsv: Set[String], errorLog: (String) => Unit) : Set[AbilityWithModifyValueDo] = {
     abilitiesFromCsv.flatMap(
       abilityName => {
-
         if(abilityName.isEmpty) {
           None
         } else {
