@@ -10,7 +10,7 @@ import play.api.Configuration
 @Singleton
 class ArmyCSVDataParser @Inject()(configuration: Configuration) extends CSVDataParser[Set[CSVFactionDto]](configuration) {
 
-  val requiredHeaders = Set(CSVHeaders.FACTIOM_HEADER, CSVHeaders.NAME_HEADER, CSVHeaders.SIZE_HEADER, CSVHeaders.QUALITY_HEADER, CSVHeaders.DEFENCE_HEADER, CSVHeaders.COST_HEADER)
+  val requiredHeaders = Set(CSVHeaders.FACTIOM_HEADER, CSVHeaders.NAME_HEADER, CSVHeaders.SIZE_HEADER, CSVHeaders.QUALITY_HEADER, CSVHeaders.DEFENSE_HEADER, CSVHeaders.COST_HEADER)
 
   override def getFileName(): String = "armies"
 
@@ -26,7 +26,7 @@ class ArmyCSVDataParser @Inject()(configuration: Configuration) extends CSVDataP
           val troopName = info._1.get(CSVHeaders.NAME_HEADER)
           val size = readCsvLineToInt(CSVHeaders.SIZE_HEADER, info)
           val quality = readCsvLineToInt(CSVHeaders.QUALITY_HEADER, info)
-          val defence = readCsvLineToInt(CSVHeaders.DEFENCE_HEADER, info)
+          val defence = readCsvLineToInt(CSVHeaders.DEFENSE_HEADER, info)
           val defaultEquipment = readCsvLineToSet(CSVHeaders.EQUIPMENT_HEADER, info)
           val defaultAbilities = readCsvLineToSet(CSVHeaders.ABILITIES_HEADER, info)
           val upgrades = readCsvLineToSet(CSVHeaders.UPGRADES_HEADER, info)

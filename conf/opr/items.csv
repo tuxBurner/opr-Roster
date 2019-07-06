@@ -1,4 +1,4 @@
-Faction;Name;Special;Defense
+Faction;Name;Abilities;Defense
 Orc Marauders;Cyborg Body;Regeneration;
 Orc Marauders;Heavy Armor;;1
 Orc Marauders;Power Armor;Slow, Tough(3);2

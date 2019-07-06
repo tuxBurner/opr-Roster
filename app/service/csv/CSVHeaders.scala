@@ -27,9 +27,9 @@ object CSVHeaders {
   val QUALITY_HEADER = "Quality"
 
   /**
-    * Header column of defence in the csv
+    * Header column of defense in the csv
     */
-  val DEFENCE_HEADER = "Defence"
+  val DEFENSE_HEADER = "Defense"
 
   /**
     * Header column of defence in the csv
@@ -100,8 +100,6 @@ object CSVHeaders {
     * Header column of modifier in the csv
     */
   val MODIFIER_HEADER = "Modifier"
-
-
 
 
 

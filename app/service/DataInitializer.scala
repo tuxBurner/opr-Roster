@@ -2,7 +2,7 @@ package service
 
 import javax.inject.{Inject, Singleton}
 import service.csv._
-import service.models.{AbilitiesDao, FactionDo, FactionsDao, TroopDao, UpgradesDao, WeaponDao}
+import service.models.{AbilitiesDao, FactionDo, FactionsDao, ItemDao, TroopDao, UpgradesDao, WeaponDao}
 
 /**
   * This calls the csv parsers does some checking on it and inserts the data into the daos
@@ -13,7 +13,8 @@ import service.models.{AbilitiesDao, FactionDo, FactionsDao, TroopDao, UpgradesD
 class DataInitializer @Inject()(armiesCsvParser: ArmyCSVDataParser,
                                 weaponsCsvParser: WeaponCsvDataParser,
                                 upgradesCsvParser: UpgradesCsvDataParser,
-                                abilitiesCsvParser: AbilitiesCsvDataParser) {
+                                abilitiesCsvParser: AbilitiesCsvDataParser,
+                                itemsCsvParser: ItemsCsvDataParser) {
 
   /**
     * Inits the data for the roster from the csvs
@@ -23,10 +24,12 @@ class DataInitializer @Inject()(armiesCsvParser: ArmyCSVDataParser,
     val csvWeaponInfos = weaponsCsvParser.parseData()
     val csvUpgradeInfos = upgradesCsvParser.parseData()
     val csvAbilitiesInfos = abilitiesCsvParser.parseData()
+    val csvItems = itemsCsvParser.parseData()
 
     addFactions(csvArmyInfos.get)
     addAbilities(csvAbilitiesInfos.get)
     addWeapons(csvWeaponInfos.get)
+    addItems(csvItems.get)
     addTroops(csvArmyInfos.get)
     addUpgrades(csvUpgradeInfos.get)
   }
@@ -89,11 +92,21 @@ class DataInitializer @Inject()(armiesCsvParser: ArmyCSVDataParser,
 
   /**
     * Adds all the csv upgrades
+    *
     * @param csvUpgrades the csv upgrades
     */
   def addUpgrades(csvUpgrades: Set[CSVUpgradeDto]): Unit = {
     UpgradesDao.deletAll()
-    csvUpgrades.foreach(UpgradesDao.addUpgradeFromCsv) 
+    csvUpgrades.foreach(UpgradesDao.addUpgradeFromCsv)
+  }
+
+  /**
+    * Adds all items from the csv items
+    * @param csvItems the items from the csv
+    */
+  def addItems(csvItems: Set[CSVItemDto]) : Unit = {
+    ItemDao.deleteAll()
+    csvItems.foreach(ItemDao.addItemFromCsv)
   }
 
 }

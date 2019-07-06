@@ -1,4 +1,4 @@
-Faction;Name;Size;Quality;Defence;Equipment;Abilities;Upgrades;Costs
+Faction;Name;Size;Quality;Defense;Equipment;Abilities;Upgrades;Costs
 Orc Marauders;Warlord;1;3;4;Pistol,CCW3;Bad Shot,Furious,Hero,Tough(3);A,B,D;50
 Orc Marauders;Mechanic;1;3;4;Pistol,CCW2;Bad Shot,Furious,Hero,Mend,Tough(3);A,B,C;60
 Orc Marauders;Shaman;1;3;5;Energy Staff;Furious,Hero,Psychic(1),Tough(3);F;60
