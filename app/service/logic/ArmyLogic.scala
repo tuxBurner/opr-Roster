@@ -36,8 +36,7 @@ class ArmyLogic @Inject()(cache: AsyncCacheApi) {
     Future(FactionsDao.findFactionByName(factionName)
       .map(_ => {
         val armyDto = ArmyDto(factionName = factionName, uuid = uuid)
-        setArmyToCache(armyDto)
-        Some(armyDto)
+        Some(setArmyToCache(armyDto))
       })
       .getOrElse({
         LOGGER.error(s"Cannot add new army the faction: $factionName does not exist")
@@ -45,9 +44,10 @@ class ArmyLogic @Inject()(cache: AsyncCacheApi) {
       }))
   }
 
-  def setArmyToCache(armyDto: ArmyDto): Unit = {
+  def setArmyToCache(armyDto: ArmyDto): ArmyDto = {
     // TODO: configure duration
     cache.sync.set(armyDto.uuid, armyDto, 15.minutes)
+    armyDto
   }
 
 
@@ -63,9 +63,14 @@ class ArmyLogic @Inject()(cache: AsyncCacheApi) {
           TroopDao.getTroopByNameAndFactionName(troopName = troopName, factionName = armyFromCache.factionName)
             .map(troopDo => {
               val newTroopDto = troopDoToDto(troopDo)
-              val updatedArmy = armyFromCache.copy(troops = armyFromCache.troops.appended(newTroopDto))
-              setArmyToCache(updatedArmy)
-              Some(updatedArmy)
+
+              val newTroops = armyFromCache.troops :+ newTroopDto
+              val armyCosts = calcTotalArmyCosts(newTroops)
+
+              val updatedArmyWithTroops = armyFromCache.copy(troops = newTroops, totalCosts = armyCosts)
+
+
+              Some(setArmyToCache(updatedArmyWithTroops))
             })
             .getOrElse({
               LOGGER.error(s"Could not find troop: $troopName for faction: ${armyFromCache.factionName}")
@@ -79,19 +84,31 @@ class ArmyLogic @Inject()(cache: AsyncCacheApi) {
       )
   }
 
+
+  /**
+    * Caclulats the total cost of the troops
+    *
+    * @param troops the troops to calculate the total cost on
+    * @return the total cost of the troops
+    */
+  private def calcTotalArmyCosts(troops: List[TroopDto]): Int = {
+    troops.map(troopDto => troopDto.costs * troopDto.amount).sum
+  }
+
   /**
     * Converts a [[TroopDo]] to a [[TroopDto]]
     *
     * @param troopDo the do to convert
     * @return the converted [[TroopDto]]
     */
-  def troopDoToDto(troopDo: TroopDo): TroopDto = {
+  private def troopDoToDto(troopDo: TroopDo): TroopDto = {
     TroopDto(uuid = UUID.randomUUID().toString,
       name = troopDo.name,
       size = troopDo.size,
       basicCosts = troopDo.costs,
       basicQuality = troopDo.quality,
       basicDefense = troopDo.defense,
+      costs = troopDo.costs,
       defense = troopDo.defense,
       shoot = troopDo.quality,
       fight = troopDo.quality
@@ -127,6 +144,7 @@ case class ArmyDto(factionName: String,
   * @param basicCosts   the initial costs of the troop
   * @param basicQuality the basic quality stat of the troop
   * @param basicDefense the basic defense stat of the troop
+  * @param costs        the current costs value which the troop has after applying all updates to it
   * @param defense      the current defense value which the troop has after applying all updates to it
   * @param shoot        the current shoot value which the troop has after applying all updates to it
   * @param fight        the current fight value which the troop has after applying all updates to it
@@ -140,6 +158,7 @@ case class TroopDto(uuid: String,
                     basicCosts: Int,
                     basicQuality: Int,
                     basicDefense: Int,
+                    costs: Int,
                     defense: Int,
                     shoot: Int,
                     fight: Int,
