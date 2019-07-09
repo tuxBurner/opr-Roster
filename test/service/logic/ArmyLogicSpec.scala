@@ -1,18 +1,19 @@
 package service.logic
 
-import org.scalatest.AsyncFlatSpec
-import play.api.Application
-import play.api.inject.guice.GuiceApplicationBuilder
+import org.scalatestplus.play.PlaySpec
+import org.scalatestplus.play.guice.GuiceOneAppPerTest
+import play.api.test.Injecting
 import service.DataInitializer
+
+import scala.concurrent.duration._
+import scala.concurrent.{Await, Future}
 
 
 /**
   * Tests for the army logic
   */
-class ArmyLogicSpec extends AsyncFlatSpec {
+class ArmyLogicSpec extends PlaySpec with GuiceOneAppPerTest with Injecting {
 
-
-  val fakeApplication: Application = new GuiceApplicationBuilder().build()
 
   val armyLogic: ArmyLogic = fakeApplication.injector.instanceOf(classOf[ArmyLogic])
   val dataInitalizer: DataInitializer = fakeApplication.injector.instanceOf(classOf[DataInitializer])
@@ -21,41 +22,51 @@ class ArmyLogicSpec extends AsyncFlatSpec {
 
   val orcMarauderFaction = "Orc Marauders"
 
-  behavior of "ArmyLogic"
+  "ArmyLogic"
 
-  it should "return empty when army is not present" in {
-    val armyNotKnown = armyLogic.getArmy("asdasasd")
-    armyNotKnown.map(armyOption => {
-      assert(armyOption.isEmpty)
-    })
+  "return empty when army is not present" in {
+    val armyNotKnown = awaitResult(armyLogic.getArmy("asdasasd"))
+    armyNotKnown mustBe empty
   }
 
-  it should "return empty when the faction name is not set correctly" in {
-    val factionNotKnown = armyLogic.addNewArmy("FactionNotKnow")
-    factionNotKnown.map(armyOption => {
-      assert(armyOption.isEmpty)
-    })
+  "return empty when the faction name is not set correctly" in {
+    val factionNotKnown = awaitResult(armyLogic.addNewArmy("FactionNotKnow"))
+    factionNotKnown mustBe empty
+
   }
 
-  it should "return an army of Orc Marauders when adding an army" in {
-    val factionKnown = armyLogic.addNewArmy(orcMarauderFaction)
-    factionKnown.map(armyOption => {
-      assert(armyOption.isDefined)
-      assert(armyOption.get.factionName == orcMarauderFaction)
-    })
+  s"return an army of $orcMarauderFaction when adding an army" in {
+    val factionKnown = awaitResult(armyLogic.addNewArmy(orcMarauderFaction))
+    factionKnown mustBe defined
+    factionKnown.get.factionName mustBe orcMarauderFaction
   }
 
-  it should "return no troops when troop name not known in faction" in {
-    val factionKnown = armyLogic.addNewArmy(orcMarauderFaction)
-    factionKnown.map(armyOption => {
-      assert(armyOption.isDefined)
+  s"return army with no troops when adding not known troop" in {
+    val factionKnown = awaitResult(armyLogic.addNewArmy(orcMarauderFaction))
+    factionKnown mustBe defined
+    val notUpdatedArmy = awaitResult(armyLogic.addTroopToArmy(factionKnown.get.uuid, "TroopNotKnown"))
+    notUpdatedArmy mustBe defined
+    notUpdatedArmy.get.troops.length mustBe 0
+  }
 
-      val armyWithNoTroops = armyLogic.addTroopToArmy(armyOption.get.uuid,"ToopNotKnow")
-      armyWithNoTroops.map(army => {
-        assert(army.isDefined)
-      }).flatten
+  s"return army when troop is known in the faction" in {
+    val factionKnown = awaitResult(armyLogic.addNewArmy(orcMarauderFaction))
+    factionKnown mustBe defined
+    val updatedArmy = awaitResult(armyLogic.addTroopToArmy(factionKnown.get.uuid, "Warlord"))
+    updatedArmy mustBe defined
+    updatedArmy.get.troops.length mustBe 1
+    updatedArmy.get.uuid mustBe factionKnown.get.uuid
 
-    })
+    // check if the cache got also updated
+    val armyFromCache = awaitResult(armyLogic.getArmy(updatedArmy.get.uuid))
+    armyFromCache mustBe defined
+    armyFromCache.get.troops.length mustBe 1
+    armyFromCache.get.uuid mustBe updatedArmy.get.uuid
+    armyFromCache.get.troops(0).uuid mustBe updatedArmy.get.troops(0).uuid
+  }
+
+  private def awaitResult[T](futureFun: Future[T]): T = {
+    Await.result(futureFun, 500.millis)
   }
 
 

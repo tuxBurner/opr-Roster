@@ -68,6 +68,8 @@ object TroopDao {
         defaultWeapons = Set.empty,
         defaultAbilities = abilities
       )
+
+      troops += newTroop
     }
   }
 

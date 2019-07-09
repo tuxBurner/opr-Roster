@@ -2,10 +2,8 @@ package service
 
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerTest
-import play.api.Application
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Injecting
-import service.models.{AbilitiesDao, FactionsDao}
+import service.models.{FactionsDao, TroopDao}
 
 /**
   * Test for the data initializer
@@ -13,8 +11,6 @@ import service.models.{AbilitiesDao, FactionsDao}
   */
 class DataInitializerSpec extends PlaySpec with GuiceOneAppPerTest with Injecting  {
 
-  override def fakeApplication(): Application = new GuiceApplicationBuilder()
-    .build()
 
   val dataInitializer: DataInitializer = fakeApplication().injector.instanceOf(classOf[DataInitializer])
 
@@ -25,6 +21,8 @@ class DataInitializerSpec extends PlaySpec with GuiceOneAppPerTest with Injectin
 
       //AbilitiesDao.abilities.length > 0 mustBe true
       FactionsDao.getAllFactionNamesOrderd().length > 0  mustBe true
+
+      TroopDao.getTroopByNameAndFactionName(troopName = "Warlord", factionName = "Orc Marauders") mustBe defined
     }
   }
 

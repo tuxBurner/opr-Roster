@@ -2,8 +2,6 @@ package service.csv
 
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerTest
-import play.api.Application
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Injecting
 
 /**
@@ -11,10 +9,7 @@ import play.api.test.Injecting
   *         Date: 03.07.19
   *         Time: 16:04
   */
-class ArmyCSVDataParserSpec extends PlaySpec with GuiceOneAppPerTest with Injecting  {
-
-  override def fakeApplication(): Application = new GuiceApplicationBuilder()
-    .build()
+class ArmyCSVDataParserSpec extends PlaySpec with GuiceOneAppPerTest with Injecting {
 
 
   val armyCsvDataparser: ArmyCSVDataParser = fakeApplication().injector.instanceOf(classOf[ArmyCSVDataParser])

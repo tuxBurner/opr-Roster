@@ -64,11 +64,12 @@ class ArmyLogic @Inject()(cache: AsyncCacheApi) {
             .map(troopDo => {
               val newTroopDto = troopDoToDto(troopDo)
               val updatedArmy = armyFromCache.copy(troops = armyFromCache.troops.appended(newTroopDto))
+              setArmyToCache(updatedArmy)
               Some(updatedArmy)
             })
             .getOrElse({
               LOGGER.error(s"Could not find troop: $troopName for faction: ${armyFromCache.factionName}")
-              None
+              Some(armyFromCache)
             })
         })
           .getOrElse({
