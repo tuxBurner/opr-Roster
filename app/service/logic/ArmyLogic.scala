@@ -27,27 +27,27 @@ class ArmyLogic @Inject()(cache: AsyncCacheApi) {
   /**
     * Adds a new army
     *
+    * @param uuid        the uuid of the army
     * @param factionName the name of the faction the army belongs to
     * @return [[None]] when something went wrong [[Some]] when everything went alright
     */
-  def addNewArmy(factionName: String): Future[Option[ArmyDto]] = {
+  def addNewArmy(uuid: String, factionName: String): Future[Option[ArmyDto]] = {
     // check if the faction exists
-    FactionsDao.findFactionByName(factionName)
-      .map(factionDo => {
-        val uuid = UUID.randomUUID().toString
+    Future(FactionsDao.findFactionByName(factionName)
+      .map(_ => {
         val armyDto = ArmyDto(factionName = factionName, uuid = uuid)
         setArmyToCache(armyDto)
-          .map(done => Some(armyDto))
+        Some(armyDto)
       })
       .getOrElse({
         LOGGER.error(s"Cannot add new army the faction: $factionName does not exist")
-        Future(None)
-      })
+        None
+      }))
   }
 
-  def setArmyToCache(armyDto: ArmyDto): Future[Done] = {
+  def setArmyToCache(armyDto: ArmyDto): Unit = {
     // TODO: configure duration
-    cache.set(armyDto.uuid, armyDto, 15.minutes)
+    cache.sync.set(armyDto.uuid, armyDto, 15.minutes)
   }
 
 
@@ -73,7 +73,7 @@ class ArmyLogic @Inject()(cache: AsyncCacheApi) {
             })
         })
           .getOrElse({
-            LOGGER.error(s"Could not add troop: $troopName to army, amry was not found in the cache")
+            LOGGER.error(s"Could not add troop: $troopName to army, army was not found in the cache")
             None
           })
       )

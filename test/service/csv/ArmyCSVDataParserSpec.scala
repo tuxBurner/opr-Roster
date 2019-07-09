@@ -17,12 +17,13 @@ class ArmyCSVDataParserSpec extends PlaySpec with GuiceOneAppPerTest with Inject
   "ArmyCSVDataParser" should {
     "parse csv" in {
       val factionsOption = armyCsvDataparser.parseData()
-      factionsOption.isEmpty mustBe false
+      factionsOption mustBe defined
       val factions = factionsOption.get
-      factions.size mustBe 1
-      factions.exists(_.name == "Not a real faction name") mustBe false
+      factions.size mustBe 2
+      val notAFaction = factions.find(_.name == "Not a real faction name")
+      notAFaction mustBe empty
       val marauders = factions.find(_.name == "Orc Marauders")
-      marauders.isEmpty mustBe false
+      marauders mustBe defined
       marauders.get.troops.size mustBe 16
 
     }
