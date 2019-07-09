@@ -32,16 +32,17 @@ class ArmyLogic @Inject()(cache: AsyncCacheApi) {
     */
   def addNewArmy(factionName: String): Future[Option[ArmyDto]] = {
     // check if the faction exists
-    val faction = FactionsDao.findFactionByName(factionName)
-    if (faction.isEmpty) {
-      LOGGER.error(s"Cannot add new army the faction: $factionName does not exist")
-      Future(None)
-    } else {
-      val uuid = UUID.randomUUID().toString
-      val armyDto = ArmyDto(factionName = factionName, uuid = uuid)
-      setArmyToCache(armyDto)
-        .map(done => Some(armyDto))
-    }
+    FactionsDao.findFactionByName(factionName)
+      .map(factionDo => {
+        val uuid = UUID.randomUUID().toString
+        val armyDto = ArmyDto(factionName = factionName, uuid = uuid)
+        setArmyToCache(armyDto)
+          .map(done => Some(armyDto))
+      })
+      .getOrElse({
+        LOGGER.error(s"Cannot add new army the faction: $factionName does not exist")
+        Future(None)
+      })
   }
 
   def setArmyToCache(armyDto: ArmyDto): Future[Done] = {

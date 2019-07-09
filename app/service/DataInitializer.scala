@@ -39,7 +39,7 @@ class DataInitializer @Inject()(armiesCsvParser: ArmyCSVDataParser,
     *
     * @param csvFactions the csv factions to add
     */
-  def addFactions(csvFactions: Set[CSVFactionDto]): Unit = {
+  private def addFactions(csvFactions: Set[CSVFactionDto]): Unit = {
     FactionsDao.deleteAll()
     csvFactions.foreach(csvFaction => {
       FactionsDao.findOrAddFaction(csvFaction.name)
@@ -51,7 +51,7 @@ class DataInitializer @Inject()(armiesCsvParser: ArmyCSVDataParser,
     *
     * @param csvFactions the csv factions containing there troops
     */
-  def addTroops(csvFactions: Set[CSVFactionDto]): Unit = {
+  private def addTroops(csvFactions: Set[CSVFactionDto]): Unit = {
     TroopDao.deleteAll()
     csvFactions.foreach(csvFaction => {
       val factionDo = FactionsDao.findFactionByName(csvFaction.name).get
@@ -64,7 +64,7 @@ class DataInitializer @Inject()(armiesCsvParser: ArmyCSVDataParser,
     *
     * @param csvAbilities the abilities from the csv to add
     */
-  def addAbilities(csvAbilities: Set[CSVAbilityDto]): Unit = {
+  private def addAbilities(csvAbilities: Set[CSVAbilityDto]): Unit = {
 
     AbilitiesDao.deleteAll()
     csvAbilities.foreach(csvAbility => AbilitiesDao.findOrAddAbility(csvAbility.name, csvAbility.modifier))
@@ -75,7 +75,7 @@ class DataInitializer @Inject()(armiesCsvParser: ArmyCSVDataParser,
     *
     * @param csvWeapons the weapons from the csv
     */
-  def addWeapons(csvWeapons: Set[CSVWeaponDto]): Unit = {
+  private def addWeapons(csvWeapons: Set[CSVWeaponDto]): Unit = {
     WeaponDao.deletAll()
     csvWeapons.foreach(WeaponDao.addWeaponFromCSV)
   }
@@ -86,7 +86,7 @@ class DataInitializer @Inject()(armiesCsvParser: ArmyCSVDataParser,
     * @param csvTroops the troops from the csv
     * @param faction   the faction the troops belong to
     */
-  def addTroopsToFaction(csvTroops: Set[CSVTroopDto], faction: FactionDo): Unit = {
+  private def addTroopsToFaction(csvTroops: Set[CSVTroopDto], faction: FactionDo): Unit = {
     csvTroops.foreach(TroopDao.addTroopFromCsvDto(_, faction))
   }
 
@@ -95,7 +95,7 @@ class DataInitializer @Inject()(armiesCsvParser: ArmyCSVDataParser,
     *
     * @param csvUpgrades the csv upgrades
     */
-  def addUpgrades(csvUpgrades: Set[CSVUpgradeDto]): Unit = {
+  private def addUpgrades(csvUpgrades: Set[CSVUpgradeDto]): Unit = {
     UpgradesDao.deletAll()
     csvUpgrades.foreach(UpgradesDao.addUpgradeFromCsv)
   }
@@ -104,7 +104,7 @@ class DataInitializer @Inject()(armiesCsvParser: ArmyCSVDataParser,
     * Adds all items from the csv items
     * @param csvItems the items from the csv
     */
-  def addItems(csvItems: Set[CSVItemDto]) : Unit = {
+  private def addItems(csvItems: Set[CSVItemDto]) : Unit = {
     ItemDao.deleteAll()
     csvItems.foreach(ItemDao.addItemFromCsv)
   }
