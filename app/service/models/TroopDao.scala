@@ -63,6 +63,7 @@ object TroopDao {
         faction = faction,
         size = csvTroop.size,
         quality = csvTroop.quality,
+        defense = csvTroop.defense,
         costs = csvTroop.costs,
         defaultWeapons = Set.empty,
         defaultAbilities = abilities
@@ -73,10 +74,23 @@ object TroopDao {
 }
 
 
+/**
+  * Represents a troop
+  *
+  * @param name             the name of the troop
+  * @param faction          the faction the troop belongs to
+  * @param size             the size of the troop
+  * @param quality          the quality of the troop
+  * @param defense          the defense of the troop
+  * @param costs            the costs of the troop
+  * @param defaultWeapons   the default weapons the troop has
+  * @param defaultAbilities the default abilities the troop has
+  */
 case class TroopDo(name: String,
                    faction: FactionDo,
                    size: Int,
                    quality: Int,
+                   defense: Int,
                    costs: Int,
                    defaultWeapons: Set[WeaponDo],
                    defaultAbilities: Set[AbilityWithModifyValueDo])

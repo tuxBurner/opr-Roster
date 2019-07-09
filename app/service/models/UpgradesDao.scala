@@ -75,14 +75,12 @@ object UpgradesDao {
         })
 
         val upgradeItemNames = csvUpgradeOption
-            .upgradeWith
-            .filter(_.withType == "I")
-            .map(_.withName)
-        val items = ItemDao.findItemsForCsv(upgradeAbilitiesName,(itemName) => {
+          .upgradeWith
+          .filter(_.withType == "I")
+          .map(_.withName)
+        val items = ItemDao.findItemsForCsv(upgradeItemNames, (itemName) => {
           LOGGER.error(s"Cannot find item: $itemName for upgrade: ${csvUpgrade.name} for rule: $ruleType faction: ${factionDo.name}")
         })
-
-        
 
 
         UpgradeRuleOptionDo(costs = csvUpgradeOption.costs,
@@ -115,9 +113,10 @@ object UpgradesDao {
 
 /**
   * Represents an upgrade
-  * @param name the name of the upgrade
+  *
+  * @param name    the name of the upgrade
   * @param faction the faction the upgrade belongs to
-  * @param rules the upgrade rules
+  * @param rules   the upgrade rules
   */
 case class UpgradeDo(name: String,
                      faction: FactionDo,
@@ -125,10 +124,11 @@ case class UpgradeDo(name: String,
 
 /**
   * Rule of an upgrade
+  *
   * @param ruleType the type of the rule
   * @param subjects on what the rule applies
-  * @param amount ho often cann the rule be applied
-  * @param options the options the rul provides
+  * @param amount   ho often cann the rule be applied
+  * @param options  the options the rul provides
   */
 case class UpgradeRuleDo(ruleType: UpgradeRuleType,
                          subjects: Set[WeaponDo],
@@ -137,8 +137,9 @@ case class UpgradeRuleDo(ruleType: UpgradeRuleType,
 
 /**
   * Options of an upgrade rule
-  * @param costs how much does the rule cost
-  * @param weapons what weapon come with the option
+  *
+  * @param costs     how much does the rule cost
+  * @param weapons   what weapon come with the option
   * @param abilities what abilities come with the option
   */
 case class UpgradeRuleOptionDo(costs: Int,

@@ -8,6 +8,7 @@ lazy val root = (project in file(".")).enablePlugins(PlayScala)
 scalaVersion := "2.13.0"
 
 libraryDependencies += guice
+libraryDependencies += caffeine
 libraryDependencies += "com.github.tototoshi" %% "scala-csv" % "1.3.6"
 libraryDependencies += "org.apache.commons" % "commons-lang3" % "3.9"
 

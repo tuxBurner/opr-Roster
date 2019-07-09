@@ -41,7 +41,7 @@ class ArmyCSVDataParser @Inject()(configuration: Configuration) extends CSVDataP
               factionName = faction.get,
               size = size.get,
               quality = quality.get,
-              defence = defence.get,
+              defense = defence.get,
               defaultEquipment = defaultEquipment,
               defaultAbilities = defaultAbilities,
               upgrades = upgrades,
@@ -77,7 +77,7 @@ case class CSVFactionDto(name: String,
   * @param factionName      the name of the faction the troop belongs to
   * @param size             the size of the troop
   * @param quality          the quality of the troop
-  * @param defence          the defence of the troop
+  * @param defense          the defence of the troop
   * @param defaultEquipment the default equipment the troop has
   * @param defaultAbilities the default abilities the troop has
   * @param upgrades         the upgrades the troop can have
@@ -87,7 +87,7 @@ case class CSVTroopDto(name: String,
                        factionName: String,
                        size: Int,
                        quality: Int,
-                       defence: Int,
+                       defense: Int,
                        defaultEquipment: Set[String],
                        defaultAbilities: Set[String],
                        upgrades: Set[String],
