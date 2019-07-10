@@ -1,7 +1,6 @@
 
 
 [![Coverage Status](https://coveralls.io/repos/github/tuxBurner/opr-Roster/badge.svg?branch=master)](https://coveralls.io/github/tuxBurner/opr-Roster?branch=master)
-
 [![Build Status](https://travis-ci.com/tuxBurner/opr-Roster.svg?branch=master)](https://travis-ci.com/tuxBurner/opr-Roster)
 
 
