@@ -106,7 +106,7 @@ class UpgradesCsvDataParser @Inject()(configuration: Configuration) extends CSVD
       val fullBlockLines = startLines :: blockLines
 
       val new_accum = resultList :+ fullBlockLines
-      if (finalList.length > 0) {
+      if (finalList.nonEmpty) {
         splitHelper(new_accum, finalList)
       } else {
         new_accum

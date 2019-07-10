@@ -92,3 +92,4 @@ case class CSVTroopDto(name: String,
                        defaultAbilities: Set[String],
                        upgrades: Set[String],
                        costs: Int)
+

@@ -1,7 +1,7 @@
 package service.csv
 
 /**
-  * Represents the name of the csv columns 
+  * Represents the name of the csv columns
   * @author Sebastian Hardt (s.hardt@micromata.de)
   */
 object CSVHeaders {
@@ -100,8 +100,4 @@ object CSVHeaders {
     * Header column of modifier in the csv
     */
   val MODIFIER_HEADER = "Modifier"
-
-
-
-
 }

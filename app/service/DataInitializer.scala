@@ -2,7 +2,7 @@ package service
 
 import javax.inject.{Inject, Singleton}
 import service.csv._
-import service.models.{AbilitiesDao, FactionDo, FactionsDao, ItemDao, TroopDao, UpgradesDao, WeaponDao}
+import service.models._
 
 /**
   * This calls the csv parsers does some checking on it and inserts the data into the daos
@@ -102,9 +102,10 @@ class DataInitializer @Inject()(armiesCsvParser: ArmyCSVDataParser,
 
   /**
     * Adds all items from the csv items
+    *
     * @param csvItems the items from the csv
     */
-  private def addItems(csvItems: Set[CSVItemDto]) : Unit = {
+  private def addItems(csvItems: Set[CSVItemDto]): Unit = {
     ItemDao.deleteAll()
     csvItems.foreach(ItemDao.addItemFromCsv)
   }

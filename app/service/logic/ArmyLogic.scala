@@ -2,15 +2,14 @@ package service.logic
 
 import java.util.UUID
 
-import akka.Done
 import javax.inject.{Inject, Singleton}
 import play.api.Logger
 import play.api.cache.AsyncCacheApi
 import service.models.{FactionsDao, TroopDao, TroopDo}
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.duration._
-import scala.concurrent.ExecutionContext.Implicits.global
 
 
 /**
@@ -44,6 +43,13 @@ class ArmyLogic @Inject()(cache: AsyncCacheApi) {
       }))
   }
 
+  /**
+    * Sets the army to the cache
+    *
+    * @param armyDto the army to set to the cache
+    * @return the army which was set to the cache
+    *         TODO: Make it async
+    */
   def setArmyToCache(armyDto: ArmyDto): ArmyDto = {
     // TODO: configure duration
     cache.sync.set(armyDto.uuid, armyDto, 15.minutes)
@@ -51,10 +57,23 @@ class ArmyLogic @Inject()(cache: AsyncCacheApi) {
   }
 
 
+  /**
+    * Gets the army from the cache
+    *
+    * @param uuid the uuid of the army
+    * @return the army from the cache or [[None]] when not found
+    */
   def getArmy(uuid: String): Future[Option[ArmyDto]] = {
     cache.get(uuid)
   }
 
+  /**
+    * Adds a troop to the army
+    *
+    * @param uuid      the uuid of the army
+    * @param troopName the nam of the troop to add
+    * @return the updated or not army
+    */
   def addTroopToArmy(uuid: String, troopName: String): Future[Option[ArmyDto]] = {
     getArmy(uuid)
       .map(armyOptionFromCache =>
@@ -83,6 +102,21 @@ class ArmyLogic @Inject()(cache: AsyncCacheApi) {
           })
       )
   }
+
+  /*def setTroopAmount(armyUuid: String, troopUuid: String, amount: Int) : Future[Option[ArmyDto]] = {
+
+   Future(None)
+  } */
+
+
+  /*if(amount <= 0) {
+    LOGGER.error(s"Cannot set amount: $amount <= 0 on troop: $troopUuid in army: $armyUuid")
+  } *(
+}
+
+def removeTroopFromArmy(armyUuid: String, troopUuid: String) : Future[Option[ArmyDto]] = {
+
+}*/
 
 
   /**

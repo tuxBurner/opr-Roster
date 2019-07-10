@@ -1,7 +1,7 @@
 package service.models
 
 import play.api.Logger
-import service.csv.CSVUpgradeDto
+import service.csv.{CSVUpgradeDto, CSVUpgradeWithDTO}
 
 import scala.collection.mutable.ListBuffer
 
@@ -39,55 +39,21 @@ object UpgradesDao {
 
     // map the rules
     val upgradeRules = csvUpgrade.rules.flatMap(csvRule => {
-      val ruleType = UpgradeRuleType.valueOf(csvRule.ruleType)
+      val ruleType = EUpgradeRuleType.valueOf(csvRule.ruleType)
 
-      // collect the subject weapons
-      val subjects = csvRule.subjects.flatMap(subject => {
-        if (subject.isEmpty) {
-          None
-        } else {
-          val weaponDo = WeaponDao.findWeaponByLinkedNameAndFactionName(subject.trim, factionDo.name)
-          if (weaponDo.isEmpty) {
-            LOGGER.error(s"Cannot find weapon: $subject for upgrade: ${csvUpgrade.name} for rule: $ruleType faction: ${factionDo.name}")
-          }
-          weaponDo
-        }
-      })
 
       val upgradeOptions = csvRule.options.map(csvUpgradeOption => {
-
-        // get all the weapons which are used by the option
-        val upgradeWeapons = csvUpgradeOption
-          .upgradeWith
-          .filter(_.withType == "W")
-          .map(_.withName)
-        val weapons = WeaponDao.findWeaponsForCsv(factionDo.name, upgradeWeapons, (weaponName) => {
-          LOGGER.error(s"Cannot find weapon: $weaponName for upgrade: ${csvUpgrade.name} for rule: $ruleType faction: ${factionDo.name}")
-        })
-
-
-        val upgradeAbilitiesName = csvUpgradeOption
-          .upgradeWith
-          .filter(_.withType == "A")
-          .map(_.withName)
-        val abilities = AbilitiesDao.findAbilitiesForCsv(upgradeAbilitiesName, (ability) => {
-          LOGGER.error(s"Cannot find ability: $ability for upgrade: ${csvUpgrade.name} for rule: $ruleType faction: ${factionDo.name}")
-        })
-
-        val upgradeItemNames = csvUpgradeOption
-          .upgradeWith
-          .filter(_.withType == "I")
-          .map(_.withName)
-        val items = ItemDao.findItemsForCsv(upgradeItemNames, (itemName) => {
-          LOGGER.error(s"Cannot find item: $itemName for upgrade: ${csvUpgrade.name} for rule: $ruleType faction: ${factionDo.name}")
-        })
-
+        val weapons = getWithWeapons(csvUpgradeOption.upgradeWith, factionDo, csvUpgrade, ruleType)
+        val abilities = getWithAbilities(csvUpgradeOption.upgradeWith, factionDo, csvUpgrade, ruleType)
+        val items = getWithItems(csvUpgradeOption.upgradeWith, factionDo, csvUpgrade, ruleType)
 
         UpgradeRuleOptionDo(costs = csvUpgradeOption.costs,
           weapons = weapons,
-          abilities = abilities)
-
+          abilities = abilities,
+          items = items)
       })
+
+      val subjects = collectSubjects(csvRule.subjects, factionDo, csvUpgrade, ruleType)
 
       Some(UpgradeRuleDo(ruleType = ruleType,
         subjects = subjects,
@@ -107,6 +73,93 @@ object UpgradesDao {
     */
   def deletAll(): Unit = {
     upgrades.clear()
+  }
+
+  /**
+    * Filters the upgrade with by the given type
+    *
+    * @param upgradeWith the upgrade with to filter
+    * @param filterType  the type to filter with
+    * @return the filtered upgrade with names
+    */
+  private def filterUpgradeWithByTypeAndGetNames(upgradeWith: Set[CSVUpgradeWithDTO], filterType: EUpgradeWithType): Set[String] = {
+    upgradeWith
+      .filter(_.withType == filterType.csvKey)
+      .map(_.withName)
+  }
+
+
+  /**
+    * Gets all with weapons
+    *
+    * @param upgradeWith set of the with options for an upgrade
+    * @param factionDo   the faction for the upgrade
+    * @param csvUpgrade  the upgrade itself
+    * @param ruleType    the current rule type
+    * @return set of [[WeaponDo]]
+    */
+  private def getWithWeapons(upgradeWith: Set[CSVUpgradeWithDTO], factionDo: FactionDo, csvUpgrade: CSVUpgradeDto, ruleType: EUpgradeRuleType): Set[WeaponDo] = {
+    // get all the weapons which are used by the option
+    val upgradeWeapons = filterUpgradeWithByTypeAndGetNames(upgradeWith, EUpgradeWithType.WEAPON)
+    WeaponDao.findWeaponsForCsv(factionDo.name, upgradeWeapons, weaponName => {
+      LOGGER.error(s"Cannot find weapon: $weaponName for upgrade: ${csvUpgrade.name} for rule: $ruleType faction: ${factionDo.name}")
+    })
+  }
+
+  /**
+    * Gets all with abilities
+    *
+    * @param upgradeWith set of the with options for an upgrade
+    * @param factionDo   the faction for the upgrade
+    * @param csvUpgrade  the upgrade itself
+    * @param ruleType    the current rule type
+    * @return set of [[AbilityWithModifyValueDo]]
+    */
+  private def getWithAbilities(upgradeWith: Set[CSVUpgradeWithDTO], factionDo: FactionDo, csvUpgrade: CSVUpgradeDto, ruleType: EUpgradeRuleType): Set[AbilityWithModifyValueDo] = {
+    val upgradeAbilitiesName = filterUpgradeWithByTypeAndGetNames(upgradeWith, EUpgradeWithType.ABILITY)
+    AbilitiesDao.findAbilitiesForCsv(upgradeAbilitiesName, ability => {
+      LOGGER.error(s"Cannot find ability: $ability for upgrade: ${csvUpgrade.name} for rule: $ruleType faction: ${factionDo.name}")
+    })
+  }
+
+  /**
+    * Gets all with items
+    *
+    * @param upgradeWith set of the with options for an upgrade
+    * @param factionDo   the faction for the upgrade
+    * @param csvUpgrade  the upgrade itself
+    * @param ruleType    the current rule type
+    * @return set of [[ItemDo]]
+    */
+  private def getWithItems(upgradeWith: Set[CSVUpgradeWithDTO], factionDo: FactionDo, csvUpgrade: CSVUpgradeDto, ruleType: EUpgradeRuleType): Set[ItemDo] = {
+    val upgradeItemNames = filterUpgradeWithByTypeAndGetNames(upgradeWith, EUpgradeWithType.ITEM)
+    ItemDao.findItemsForCsv(upgradeItemNames, itemName => {
+      LOGGER.error(s"Cannot find item: $itemName for upgrade: ${csvUpgrade.name} for rule: $ruleType faction: ${factionDo.name}")
+    })
+  }
+
+  /**
+    * Gets all subjects
+    *
+    * @param csvSubjects the csv subjects
+    * @param factionDo   the faction for the upgrade
+    * @param csvUpgrade  the upgrade itself
+    * @param ruleType    the current rule type
+    * @return set of [[WeaponDo]]
+    */
+  private def collectSubjects(csvSubjects: Set[String], factionDo: FactionDo, csvUpgrade: CSVUpgradeDto, ruleType: EUpgradeRuleType): Set[WeaponDo] = {
+    // collect the subject weapons
+    csvSubjects.flatMap(subject => {
+      if (subject.isEmpty) {
+        None
+      } else {
+        val weaponDo = WeaponDao.findWeaponByLinkedNameAndFactionName(subject.trim, factionDo.name)
+        if (weaponDo.isEmpty) {
+          LOGGER.error(s"Cannot find weapon: $subject for upgrade: ${csvUpgrade.name} for rule: $ruleType faction: ${factionDo.name}")
+        }
+        weaponDo
+      }
+    })
   }
 }
 
@@ -130,7 +183,7 @@ case class UpgradeDo(name: String,
   * @param amount   ho often cann the rule be applied
   * @param options  the options the rul provides
   */
-case class UpgradeRuleDo(ruleType: UpgradeRuleType,
+case class UpgradeRuleDo(ruleType: EUpgradeRuleType,
                          subjects: Set[WeaponDo],
                          amount: Int,
                          options: Set[UpgradeRuleOptionDo])
@@ -141,7 +194,9 @@ case class UpgradeRuleDo(ruleType: UpgradeRuleType,
   * @param costs     how much does the rule cost
   * @param weapons   what weapon come with the option
   * @param abilities what abilities come with the option
+  * @param items     what items come with the option
   */
 case class UpgradeRuleOptionDo(costs: Int,
                                weapons: Set[WeaponDo],
-                               abilities: Set[AbilityWithModifyValueDo])
+                               abilities: Set[AbilityWithModifyValueDo],
+                               items: Set[ItemDo])
