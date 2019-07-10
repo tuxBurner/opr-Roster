@@ -4,5 +4,9 @@ addSbtPlugin("org.foundweekends.giter8" % "sbt-giter8-scaffold" % "0.11.0")
 // coverage build plugin
 addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.6.0")
 
+//coveralls plugin to get coverage
+addSbtPlugin("org.scoverage" % "sbt-coveralls" % "1.2.7")
+
+
 // style checker
 addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "1.0.0")
