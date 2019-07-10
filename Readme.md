@@ -10,7 +10,7 @@ At the moment it is made for the Grindmark Future Firefight
 
 ## Todos
 
-  * Marauders have diffrent stats on the ccw
-  * Marauders Combat Bike
-  * Battle Brothers Bike
-  * Marauders how to do bomb hamme in H 
+*  Marauders have diffrent stats on the ccw
+*  Marauders Combat Bike
+*  Battle Brothers Bike
+*  Marauders how to do bomb hamme in H 
