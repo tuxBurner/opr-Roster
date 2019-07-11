@@ -103,20 +103,62 @@ class ArmyLogic @Inject()(cache: AsyncCacheApi) {
       )
   }
 
-  /*def setTroopAmount(armyUuid: String, troopUuid: String, amount: Int) : Future[Option[ArmyDto]] = {
 
-   Future(None)
-  } */
+  /**
+    * Sets the amount of the troop in the army
+    *
+    * @param armyUuid  the uuid of the army
+    * @param troopUuid the uuid of the troop to set the amount for
+    * @param amount    the new amount to set
+    * @return the updated army
+    */
+  def setTroopAmount(armyUuid: String, troopUuid: String, amount: Int): Future[Option[ArmyDto]] = {
+    getArmyAndTroopForUpdate(armyUuid, troopUuid, (army, troop) => {
+      if (amount <= 0) {
+        LOGGER.error(s"Cannot set amount: $amount <= 0 on troop: $troopUuid in army: $armyUuid")
+        Some(army)
+      } else {
+        val newTroops = army.troops.map(troopInArmy => {
+          if(troopInArmy.uuid != troop.uuid) {
+            troopInArmy
+          } else {
+            troopInArmy.copy(amount = amount)
+          }
+        })
 
+        Some(army.copy(troops = newTroops, totalCosts = calcTotalArmyCosts(newTroops)))
+      }
+    })
+  }
 
-  /*if(amount <= 0) {
-    LOGGER.error(s"Cannot set amount: $amount <= 0 on troop: $troopUuid in army: $armyUuid")
-  } *(
-}
-
-def removeTroopFromArmy(armyUuid: String, troopUuid: String) : Future[Option[ArmyDto]] = {
-
-}*/
+  /**
+    * Gets the army by the uuid and the troop in the army by the uuid and when found both of them applies them on the changeArmyFun
+    *
+    * @param armyUuid      the uuid of the army
+    * @param troopUuid     the troop uuid
+    * @param changeArmyFun function to apply on the army and troop when both where found
+    * @return [[None]] when the army was not found else [[ArmyDto]] which was changed or not
+    */
+  private def getArmyAndTroopForUpdate(armyUuid: String, troopUuid: String, changeArmyFun: (ArmyDto, TroopDto) => Option[ArmyDto]): Future[Option[ArmyDto]] = getArmy(armyUuid)
+    .map(armyOption => {
+      armyOption.map(army => {
+        // check if the troop is in the army an when so apply the changeArmyFun
+        army
+          .troops
+          .find(_.uuid == troopUuid)
+          .map(troop => {
+            changeArmyFun(army, troop)
+          })
+          .getOrElse({
+            LOGGER.error(s"Cannot perform change on troop: $troopUuid was not found in army: $armyUuid")
+            Some(army)
+          })
+      })
+        .getOrElse({
+          LOGGER.error(s"Could not perform change on army: $armyUuid was not found in cache")
+          None
+        })
+    })
 
 
   /**

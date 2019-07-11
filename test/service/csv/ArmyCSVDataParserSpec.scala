@@ -6,8 +6,6 @@ import play.api.test.Injecting
 
 /**
   * @author Sebastian Hardt (s.hardt@micromata.de)
-  *         Date: 03.07.19
-  *         Time: 16:04
   */
 class ArmyCSVDataParserSpec extends PlaySpec with GuiceOneAppPerTest with Injecting {
 

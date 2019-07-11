@@ -41,7 +41,7 @@ class ArmyLogicSpec extends PlaySpec with GuiceOneAppPerTest with Injecting {
 
     s"return army with no troops when adding not known troop" in {
       val uuid = UUID.randomUUID().toString
-      val factionKnown = getFResultDefined(armyLogic.addNewArmy(uuid, orcMarauderFaction))
+      getFResultDefined(armyLogic.addNewArmy(uuid, orcMarauderFaction))
 
       val notUpdatedArmy = getFResultDefined(armyLogic.addTroopToArmy(uuid, "TroopNotKnown"))
       notUpdatedArmy.troops.length mustBe 0
@@ -53,7 +53,7 @@ class ArmyLogicSpec extends PlaySpec with GuiceOneAppPerTest with Injecting {
 
     s"return army when troop is known in the faction" in {
       val uuid = UUID.randomUUID().toString
-      val factionKnown = getFResultDefined(armyLogic.addNewArmy(uuid, orcMarauderFaction))
+      getFResultDefined(armyLogic.addNewArmy(uuid, orcMarauderFaction))
 
       val updatedArmy = getFResultDefined(armyLogic.addTroopToArmy(uuid, "Warlord"))
       updatedArmy.troops.length mustBe 1
@@ -67,6 +67,53 @@ class ArmyLogicSpec extends PlaySpec with GuiceOneAppPerTest with Injecting {
 
       armyFromCache.totalCosts mustBe 50
     }
+
+    s"updating amount for troop does not work when army is not found" in {
+      testFResultUndefined(armyLogic.setTroopAmount("notknown","asdasasd",amount = 12))
+    }
+
+    s"update amount of troop does not work when troop was not found" in {
+      val uuid = UUID.randomUUID().toString
+      getFResultDefined(armyLogic.addNewArmy(uuid, orcMarauderFaction))
+      val notChangedArmy = getFResultDefined(armyLogic.setTroopAmount(uuid,"asdasasd",amount = 12))
+      notChangedArmy.troops.length mustBe 0
+    }
+
+    s"update amount of troop does not work when amount is 0 or smaller" in {
+      val uuid = UUID.randomUUID().toString
+      getFResultDefined(armyLogic.addNewArmy(uuid, orcMarauderFaction))
+
+      val updatedArmy = getFResultDefined(armyLogic.addTroopToArmy(uuid, "Warlord"))
+      updatedArmy.troops.length mustBe 1
+
+      val troopUuid = updatedArmy.troops(0).uuid
+
+      val notChangedArmy = getFResultDefined(armyLogic.setTroopAmount(uuid,troopUuid,amount = 0))
+      notChangedArmy.troops.length mustBe 1
+      notChangedArmy.troops(0).amount mustBe 1
+
+      val notChangedArmy2 = getFResultDefined(armyLogic.setTroopAmount(uuid,troopUuid,amount = -1))
+      notChangedArmy2.troops.length mustBe 1
+      notChangedArmy2.troops(0).amount mustBe 1
+    }
+
+    s"update amount of troop does work when amount is okay" in {
+      val uuid = UUID.randomUUID().toString
+      getFResultDefined(armyLogic.addNewArmy(uuid, orcMarauderFaction))
+
+      val updatedArmy = getFResultDefined(armyLogic.addTroopToArmy(uuid, "Warlord"))
+      updatedArmy.troops.length mustBe 1
+
+      val troopUuid = updatedArmy.troops(0).uuid
+
+      val changedArmy = getFResultDefined(armyLogic.setTroopAmount(uuid,troopUuid,amount = 10))
+      changedArmy.troops.length mustBe 1
+      changedArmy.troops(0).amount mustBe 10
+      changedArmy.totalCosts mustBe 500
+
+
+    }
+
   }
 
   /**
