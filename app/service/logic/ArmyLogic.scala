@@ -131,6 +131,20 @@ class ArmyLogic @Inject()(cache: AsyncCacheApi) {
     })
   }
 
+
+  /**
+    * Removes the given troop from the given army
+    * @param armyUuid the uuid of the army where to remove the troop from
+    * @param troopUuid the uuid of the troop to remove from the army
+    * @return the army without the troop
+    */
+  def removeTroopFromArmy(armyUuid: String, troopUuid: String) : Future[Option[ArmyDto]] = {
+    getArmyAndTroopForUpdate(armyUuid, troopUuid, (army, troop) => {
+      val newTroops = army.troops.filterNot(_.uuid == troop.uuid)
+      Some(army.copy(troops = newTroops, totalCosts = calcTotalArmyCosts(newTroops)))
+    })
+  }
+
   /**
     * Gets the army by the uuid and the troop in the army by the uuid and when found both of them applies them on the changeArmyFun
     *

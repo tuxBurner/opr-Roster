@@ -69,13 +69,15 @@ class ArmyLogicSpec extends PlaySpec with GuiceOneAppPerTest with Injecting {
     }
 
     s"updating amount for troop does not work when army is not found" in {
-      testFResultUndefined(armyLogic.setTroopAmount("notknown","asdasasd",amount = 12))
+      val troopAmount = 10
+      testFResultUndefined(armyLogic.setTroopAmount("notknown","asdasasd",amount = troopAmount))
     }
 
     s"update amount of troop does not work when troop was not found" in {
       val uuid = UUID.randomUUID().toString
       getFResultDefined(armyLogic.addNewArmy(uuid, orcMarauderFaction))
-      val notChangedArmy = getFResultDefined(armyLogic.setTroopAmount(uuid,"asdasasd",amount = 12))
+      val troopAmount = 10
+      val notChangedArmy = getFResultDefined(armyLogic.setTroopAmount(uuid,"asdasasd",amount = troopAmount))
       notChangedArmy.troops.length mustBe 0
     }
 
@@ -106,12 +108,28 @@ class ArmyLogicSpec extends PlaySpec with GuiceOneAppPerTest with Injecting {
 
       val troopUuid = updatedArmy.troops(0).uuid
 
-      val changedArmy = getFResultDefined(armyLogic.setTroopAmount(uuid,troopUuid,amount = 10))
+      val troopAmount = 10
+
+      val changedArmy = getFResultDefined(armyLogic.setTroopAmount(uuid,troopUuid,amount = troopAmount))
       changedArmy.troops.length mustBe 1
       changedArmy.troops(0).amount mustBe 10
       changedArmy.totalCosts mustBe 500
+    }
 
+    s"remove troop from army works" in {
+      val uuid = UUID.randomUUID().toString
+      getFResultDefined(armyLogic.addNewArmy(uuid, orcMarauderFaction))
+      getFResultDefined(armyLogic.addTroopToArmy(uuid, "Warlord"))
+      val updatedArmy = getFResultDefined(armyLogic.addTroopToArmy(uuid, "Warlord"))
+      updatedArmy.troops.length mustBe 2
+      updatedArmy.totalCosts mustBe 100
 
+      val troopUuidToRemove = updatedArmy.troops(0).uuid
+
+      val removedTroopArmy = getFResultDefined(armyLogic.removeTroopFromArmy(uuid,troopUuidToRemove))
+      removedTroopArmy.troops.length mustBe 1
+      removedTroopArmy.troops.exists(_.uuid == troopUuidToRemove) mustBe false
+      removedTroopArmy.totalCosts mustBe 50
     }
 
   }
