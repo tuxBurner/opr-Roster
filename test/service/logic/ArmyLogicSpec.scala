@@ -132,6 +132,18 @@ class ArmyLogicSpec extends PlaySpec with GuiceOneAppPerTest with Injecting {
       removedTroopArmy.totalCosts mustBe 50
     }
 
+    s"cannot set name on army which does not exists" in {
+      testFResultUndefined(armyLogic.setArmyName("asdasdasd","asdasasasd"))
+    }
+
+    s"set name on army works" in {
+      val uuid = UUID.randomUUID().toString
+      val army = getFResultDefined(armyLogic.addNewArmy(uuid, orcMarauderFaction))
+      army.name mustBe empty
+      val armyWithName = getFResultDefined(armyLogic.setArmyName(uuid,"Hero's of the Horde"))
+      armyWithName.name mustBe "Hero's of the Horde"
+    }
+
   }
 
   /**

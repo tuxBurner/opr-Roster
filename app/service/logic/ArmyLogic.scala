@@ -119,7 +119,7 @@ class ArmyLogic @Inject()(cache: AsyncCacheApi) {
         Some(army)
       } else {
         val newTroops = army.troops.map(troopInArmy => {
-          if(troopInArmy.uuid != troop.uuid) {
+          if (troopInArmy.uuid != troop.uuid) {
             troopInArmy
           } else {
             troopInArmy.copy(amount = amount)
@@ -131,14 +131,29 @@ class ArmyLogic @Inject()(cache: AsyncCacheApi) {
     })
   }
 
+  /**
+    * Sets the nam on the army
+    *
+    * @param armyUuid the uuid of the army
+    * @param armyName the name of the army to set
+    * @return the army with the new name
+    */
+  def setArmyName(armyUuid: String, armyName: String): Future[Option[ArmyDto]] = {
+    getArmy(armyUuid)
+      .map(armyOption => {
+        armyOption.map(armyFromCache => armyFromCache.copy(name = armyName))
+      })
+  }
+
 
   /**
     * Removes the given troop from the given army
-    * @param armyUuid the uuid of the army where to remove the troop from
+    *
+    * @param armyUuid  the uuid of the army where to remove the troop from
     * @param troopUuid the uuid of the troop to remove from the army
     * @return the army without the troop
     */
-  def removeTroopFromArmy(armyUuid: String, troopUuid: String) : Future[Option[ArmyDto]] = {
+  def removeTroopFromArmy(armyUuid: String, troopUuid: String): Future[Option[ArmyDto]] = {
     getArmyAndTroopForUpdate(armyUuid, troopUuid, (army, troop) => {
       val newTroops = army.troops.filterNot(_.uuid == troop.uuid)
       Some(army.copy(troops = newTroops, totalCosts = calcTotalArmyCosts(newTroops)))
