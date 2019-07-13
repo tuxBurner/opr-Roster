@@ -41,6 +41,11 @@ object TroopDao {
       .find(troop => troop.name == troopName && troop.faction.name == factionName)
   }
 
+  /**
+    * Adds a troop from a csv troop record
+    * @param csvTroop the troop from ghe csv
+    * @param faction the faction the troop belongs to
+    */
   def addTroopFromCsvDto(csvTroop: CSVTroopDto, faction: FactionDo): Unit = {
 
     // check if the troop already exists
@@ -73,7 +78,7 @@ object TroopDao {
         quality = csvTroop.quality,
         defense = csvTroop.defense,
         costs = csvTroop.costs,
-        defaultWeapons = Set.empty,
+        defaultWeapons = weapons,
         defaultAbilities = abilities,
         upgrades = upgrades
       )
