@@ -5,7 +5,7 @@ import java.util.UUID
 import javax.inject.{Inject, Singleton}
 import play.api.Logger
 import play.api.cache.AsyncCacheApi
-import service.models.{FactionsDao, TroopDao, TroopDo}
+import service.models.{AbilityWithModifyValueDo, FactionsDao, ItemDo, TroopDao, TroopDo, WeaponDo}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -168,7 +168,7 @@ class ArmyLogic @Inject()(cache: AsyncCacheApi) {
     * @param changeArmyFun function to apply on the army and troop when both where found
     * @return [[None]] when the army was not found else [[ArmyDto]] which was changed or not
     */
-  private def getArmyAndTroopForUpdate(armyUuid: String, troopUuid: String, changeArmyFun: (ArmyDto, TroopDto) => Option[ArmyDto]): Future[Option[ArmyDto]] = getArmy(armyUuid)
+  def getArmyAndTroopForUpdate(armyUuid: String, troopUuid: String, changeArmyFun: (ArmyDto, TroopDto) => Option[ArmyDto]): Future[Option[ArmyDto]] = getArmy(armyUuid)
     .map(armyOption => {
       armyOption.map(army => {
         // check if the troop is in the army an when so apply the changeArmyFun
@@ -207,17 +207,90 @@ class ArmyLogic @Inject()(cache: AsyncCacheApi) {
     * @return the converted [[TroopDto]]
     */
   private def troopDoToDto(troopDo: TroopDo): TroopDto = {
-    TroopDto(uuid = UUID.randomUUID().toString,
+    applyTroopChangeValues(TroopDto(uuid = UUID.randomUUID().toString,
       name = troopDo.name,
       size = troopDo.size,
       basicCosts = troopDo.costs,
       basicQuality = troopDo.quality,
       basicDefense = troopDo.defense,
       costs = troopDo.costs,
-      defense = troopDo.defense,
-      shoot = troopDo.quality,
-      fight = troopDo.quality
-    )
+      currentAbilities = troopDo.defaultAbilities.map(abilityDoToDto),
+      currentItems = Set.empty,
+      currentWeapons = troopDo.defaultWeapons.map(weaponDoToDto),
+      possibleUpgrades = troopDo.upgrades
+    ))
+  }
+
+  /**
+    * Goes through the items, abilities etc and checks if the values of the troop are changing
+    *
+    * @param troopDto the troop to check on
+    * @return the troop with the changed values
+    */
+  private def applyTroopChangeValues(troopDto: TroopDto): TroopDto = {
+    // check if we have an ability which modfifies the shoot quality
+    val shootQuality = troopDto.currentAbilities
+      .find(_.shootQuality >= 0)
+      .map(ability => {
+        LOGGER.info(s"Changed troop: ${troopDto.name} shoot quality from: ${troopDto.basicQuality} to: ${ability.shootQuality} cause of ability: ${ability.name}")
+        ability.shootQuality
+      })
+      .getOrElse(troopDto.basicQuality)
+
+
+    // check if the troop has an item which modifies the defense
+    val defense = troopDto.currentItems
+      .find(_.defenseModifier > 0)
+      .map(item => {
+        LOGGER.info(s"Changed troop: ${troopDto.name} defense from: ${troopDto.basicDefense} to: ${item.defenseModifier} cause of item: ${item.name}")
+        item.defenseModifier
+      })
+      .getOrElse(troopDto.basicDefense)
+
+
+
+    troopDto.copy(shoot = shootQuality,
+      defense = defense)
+  }
+
+
+  /**
+    * Converts the given [[WeaponDo]] to a [[WeaponDto]]
+    *
+    * @param weaponDo the weapon do to convert
+    * @return the converted [[WeaponDto]]
+    */
+  private def weaponDoToDto(weaponDo: WeaponDo): WeaponDto = {
+    WeaponDto(name = weaponDo.name,
+      linkedName = weaponDo.linkedName,
+      range = weaponDo.range,
+      attacks = weaponDo.attacks,
+      armorPiercing = weaponDo.armorPiercing,
+      abilities = weaponDo.abilities.map(abilityDoToDto))
+  }
+
+  /**
+    * Converts the given [[AbilityWithModifyValueDo]] to a [[AbilityDto]]
+    *
+    * @param abilityDo the ability do to convert
+    * @return the converted [[AbilityDto]]
+    */
+  private def abilityDoToDto(abilityDo: AbilityWithModifyValueDo): AbilityDto = {
+    AbilityDto(name = abilityDo.ability.name,
+      modifier = abilityDo.modifyValue,
+      shootQuality = abilityDo.ability.shootQuality)
+  }
+
+  /**
+    * Converts the given [[ItemDo]] to a [[ItemDto]]
+    *
+    * @param itemDo the item do to convert
+    * @return the converted [[ItemDto]]
+    */
+  private def itemDoToDto(itemDo: ItemDo): ItemDto = {
+    ItemDto(name = itemDo.name,
+      abilities = itemDo.abilities.map(abilityDoToDto),
+      defenseModifier = itemDo.defensModifier)
   }
 
 
@@ -242,19 +315,23 @@ case class ArmyDto(factionName: String,
 /**
   * Represents a troop which belong to an army
   *
-  * @param uuid         the uuid of the troop
-  * @param name         the name of the troop
-  * @param amount       how many are in the army
-  * @param size         the size of the troop
-  * @param basicCosts   the initial costs of the troop
-  * @param basicQuality the basic quality stat of the troop
-  * @param basicDefense the basic defense stat of the troop
-  * @param costs        the current costs value which the troop has after applying all updates to it
-  * @param defense      the current defense value which the troop has after applying all updates to it
-  * @param shoot        the current shoot value which the troop has after applying all updates to it
-  * @param fight        the current fight value which the troop has after applying all updates to it
-  * @param move         the current move value which the troop has after applying all updates to it
-  * @param sprint       the current sprint value which the troop has after applying all updates to it
+  * @param uuid             the uuid of the troop
+  * @param name             the name of the troop
+  * @param amount           how many are in the army
+  * @param size             the size of the troop
+  * @param basicCosts       the initial costs of the troop
+  * @param basicQuality     the basic quality stat of the troop
+  * @param basicDefense     the basic defense stat of the troop
+  * @param costs            the current costs value which the troop has after applying all updates to it
+  * @param defense          the current defense value which the troop has after applying all updates to it
+  * @param shoot            the current shoot value which the troop has after applying all updates to it
+  * @param fight            the current fight value which the troop has after applying all updates to it
+  * @param move             the current move value which the troop has after applying all updates to it
+  * @param sprint           the current sprint value which the troop has after applying all updates to it
+  * @param currentAbilities the current abilities the troop has
+  * @param currentItems     the current items the troop has
+  * @param currentWeapons   the current weapons the troop has
+  * @param possibleUpgrades the names of the upgrades the troop can use
   */
 case class TroopDto(uuid: String,
                     name: String,
@@ -264,9 +341,52 @@ case class TroopDto(uuid: String,
                     basicQuality: Int,
                     basicDefense: Int,
                     costs: Int,
-                    defense: Int,
-                    shoot: Int,
-                    fight: Int,
+                    defense: Int = 0,
+                    shoot: Int = 0,
+                    fight: Int = 0,
                     move: Int = 3,
-                    sprint: Int = 3
+                    sprint: Int = 3,
+                    currentWeapons: Set[WeaponDto],
+                    currentAbilities: Set[AbilityDto],
+                    currentItems: Set[ItemDto],
+                    possibleUpgrades: Set[String]
                    )
+
+/**
+  * Represents a weapon
+  *
+  * @param name          the name of the weapon
+  * @param linkedName    the linked name of the weapon
+  * @param range         the range of the weapon
+  * @param attacks       the attacks the weapon has
+  * @param armorPiercing the armor piercing of the weapon
+  * @param abilities     the abilities of the weapon
+  */
+case class WeaponDto(name: String,
+                     linkedName: String,
+                     range: Int,
+                     attacks: Int,
+                     armorPiercing: Int,
+                     abilities: Set[AbilityDto])
+
+/**
+  * Represtents an item
+  *
+  * @param name            the name of the item
+  * @param abilities       the abilities the item provides
+  * @param defenseModifier when [[Some]] how mich does the item modify the defense of the troop
+  */
+case class ItemDto(name: String,
+                   abilities: Set[AbilityDto],
+                   defenseModifier: Int)
+
+/**
+  * Represents an ability
+  *
+  * @param name         the name of the ability
+  * @param modifier     the modify value of the ability
+  * @param shootQuality when not 0 the shoot quality of the troop is changed
+  */
+case class AbilityDto(name: String,
+                      modifier: Option[Int],
+                      shootQuality: Int)

@@ -30,8 +30,8 @@ class DataInitializer @Inject()(armiesCsvParser: ArmyCSVDataParser,
     addAbilities(csvAbilitiesInfos.get)
     addWeapons(csvWeaponInfos.get)
     addItems(csvItems.get)
-    addTroops(csvArmyInfos.get)
     addUpgrades(csvUpgradeInfos.get)
+    addTroops(csvArmyInfos.get)
   }
 
   /**
@@ -67,7 +67,7 @@ class DataInitializer @Inject()(armiesCsvParser: ArmyCSVDataParser,
   private def addAbilities(csvAbilities: Set[CSVAbilityDto]): Unit = {
 
     AbilitiesDao.deleteAll()
-    csvAbilities.foreach(csvAbility => AbilitiesDao.findOrAddAbility(csvAbility.name, csvAbility.modifier))
+    csvAbilities.foreach(csvAbility => AbilitiesDao.findOrAddAbility(csvAbility.name, csvAbility.modifier, csvAbility.shootQuality))
   }
 
   /**

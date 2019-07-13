@@ -69,6 +69,40 @@ object UpgradesDao {
   }
 
   /**
+    * Gets all the upgrades for the given faction an names
+    * @param factionName the name of the faction
+    * @param upgradeNames the names of the upgrades to get
+    * @return [[List]] of upgrades which matches the faction and the names
+    */
+  def getUpgradesForFactionAndNames(factionName: String, upgradeNames: Set[String]) : List[UpgradeDo] = {
+    upgrades
+      .filter(upgrade => upgrade.faction.name == factionName && upgradeNames.contains(upgrade.name))
+      .toList
+      .sortBy(_.name)
+  }
+
+  /**
+    * Gets the upgrade for the given faction and name
+    *
+    * @param factionName the name of the faction
+    * @param upgradeName the name of the upgrade
+    * @return [[None]] when the upgrade was not found  [[Some]] when the upgrade was found
+    */
+  def getUpgradeForFactionByName(factionName: String, upgradeName: String): Option[UpgradeDo] = {
+    if (upgradeName.isEmpty) {
+      None
+    } else {
+      upgrades
+        .find(upgrade => upgrade.faction.name == factionName && upgradeName == upgrade.name)
+        .map(Some(_))
+        .getOrElse({
+          LOGGER.error(s"Could not find upgrade: $upgradeName for faction: $factionName")
+          None
+        })
+    }
+  }
+
+  /**
     * Removes all the [[UpgradeDo]]
     */
   def deletAll(): Unit = {

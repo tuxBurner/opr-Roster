@@ -100,4 +100,9 @@ object CSVHeaders {
     * Header column of modifier in the csv
     */
   val MODIFIER_HEADER = "Modifier"
+
+  /**
+    * Header column of the shoot quality modifier
+    */
+  val SHOOT_QUALITY_HEADER = "ShootQuality"
 }

@@ -25,11 +25,13 @@ object AbilitiesDao {
     * @param modifier true when the ability has a modifier
     * @return the [[AbilityDo]] which was found or newly created
     */
-  def findOrAddAbility(name: String, modifier: Boolean): AbilityDo = {
+  def findOrAddAbility(name: String, modifier: Boolean, shootQuality: Int): AbilityDo = {
     findAbilityByName(name)
       .getOrElse({
-        LOGGER.info(s"Adding new ability: $name ($modifier)")
-        val abilityDo = AbilityDo(name = name, modifier = modifier)
+        LOGGER.info(s"Adding new ability: $name ($modifier) shootQuality: $shootQuality")
+        val abilityDo = AbilityDo(name = name,
+          modifier = modifier,
+          shootQuality = shootQuality)
         abilities += abilityDo
         abilityDo
       })
@@ -75,14 +77,15 @@ object AbilitiesDao {
 
   /**
     * Gets the abilities from the csv string
+    *
     * @param abilitiesFromCsv the strings from the csv
-    * @param errorLog the logging callback
+    * @param errorLog         the logging callback
     * @return [[Set]] of [[AbilityWithModifyValueDo]]
     */
-  def findAbilitiesForCsv(abilitiesFromCsv: Set[String], errorLog: (String) => Unit) : Set[AbilityWithModifyValueDo] = {
+  def findAbilitiesForCsv(abilitiesFromCsv: Set[String], errorLog: String => Unit): Set[AbilityWithModifyValueDo] = {
     abilitiesFromCsv.flatMap(
       abilityName => {
-        if(abilityName.isEmpty) {
+        if (abilityName.isEmpty) {
           None
         } else {
           val parsedAbilityString = AbilitiesDao.parseAbilityString(abilityName)
@@ -103,11 +106,13 @@ object AbilitiesDao {
 /**
   * Represents an ability
   *
-  * @param name     the name of the ability
-  * @param modifier true when the ability has a modifier
+  * @param name         the name of the ability
+  * @param modifier     true when the ability has a modifier
+  * @param shootQuality when not 0 changes the shoot quality of the troop
   */
 case class AbilityDo(name: String,
-                     modifier: Boolean)
+                     modifier: Boolean,
+                     shootQuality: Int)
 
 /**
   * Represents an ability with its modify value

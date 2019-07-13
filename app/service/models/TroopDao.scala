@@ -59,6 +59,14 @@ object TroopDao {
         LOGGER.error(s"Could not find weapon: $weaponName for troop: ${csvTroop.name} in faction: ${csvTroop.factionName}")
       })
 
+
+      // do this to get only the upgrades which are available
+      val upgrades = csvTroop
+        .upgrades
+        .flatMap(csvUpgradeName => UpgradesDao.getUpgradeForFactionByName(faction.name,csvUpgradeName))
+        .map(_.name)
+
+
       val newTroop = TroopDo(name = csvTroop.name,
         faction = faction,
         size = csvTroop.size,
@@ -66,7 +74,8 @@ object TroopDao {
         defense = csvTroop.defense,
         costs = csvTroop.costs,
         defaultWeapons = Set.empty,
-        defaultAbilities = abilities
+        defaultAbilities = abilities,
+        upgrades = upgrades
       )
 
       troops += newTroop
@@ -87,6 +96,7 @@ object TroopDao {
   * @param costs            the costs of the troop
   * @param defaultWeapons   the default weapons the troop has
   * @param defaultAbilities the default abilities the troop has
+  * @param upgrades         the upgrade names the troop can use
   */
 case class TroopDo(name: String,
                    faction: FactionDo,
@@ -95,4 +105,5 @@ case class TroopDo(name: String,
                    defense: Int,
                    costs: Int,
                    defaultWeapons: Set[WeaponDo],
-                   defaultAbilities: Set[AbilityWithModifyValueDo])
+                   defaultAbilities: Set[AbilityWithModifyValueDo],
+                   upgrades: Set[String])
