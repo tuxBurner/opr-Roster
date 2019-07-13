@@ -1,6 +1,7 @@
 package service.models
 
 import play.api.Logger
+import service.csv.CSVAbilityDto
 
 import scala.collection.mutable.ListBuffer
 
@@ -21,17 +22,19 @@ object AbilitiesDao {
   /**
     * Tries to find the ability by the given name when it does not exists it will be added
     *
-    * @param name     the name of the ability
-    * @param modifier true when the ability has a modifier
+    * @param csvAbilityDto the csv ability to use to add the ability
     * @return the [[AbilityDo]] which was found or newly created
     */
-  def findOrAddAbility(name: String, modifier: Boolean, shootQuality: Int): AbilityDo = {
-    findAbilityByName(name)
+  def findOrAddAbilityFromCsv(csvAbilityDto: CSVAbilityDto): AbilityDo = {
+    findAbilityByName(csvAbilityDto.name)
       .getOrElse({
-        LOGGER.info(s"Adding new ability: $name ($modifier) shootQuality: $shootQuality")
-        val abilityDo = AbilityDo(name = name,
-          modifier = modifier,
-          shootQuality = shootQuality)
+        LOGGER.info(s"Adding new ability: ${csvAbilityDto.name} (${csvAbilityDto.modifier}) shoot: ${csvAbilityDto.shoot} " +
+          s"move: ${csvAbilityDto.move} sprint: ${csvAbilityDto.sprint}")
+        val abilityDo = AbilityDo(name = csvAbilityDto.name,
+          modifier = csvAbilityDto.modifier,
+          shoot = csvAbilityDto.shoot,
+          move = csvAbilityDto.move,
+          sprint = csvAbilityDto.sprint)
         abilities += abilityDo
         abilityDo
       })
@@ -106,13 +109,17 @@ object AbilitiesDao {
 /**
   * Represents an ability
   *
-  * @param name         the name of the ability
-  * @param modifier     true when the ability has a modifier
-  * @param shootQuality when not 0 changes the shoot quality of the troop
+  * @param name     the name of the ability
+  * @param modifier true when the ability has a modifier
+  * @param shoot    when not 0 changes the shoot quality of the troop
+  * @param move     when not 0 changes the move of the troop
+  * @param sprint   when not 0 changes sprint quality of the troop
   */
 case class AbilityDo(name: String,
                      modifier: Boolean,
-                     shootQuality: Int)
+                     shoot: Int,
+                     move: Int,
+                     sprint: Int)
 
 /**
   * Represents an ability with its modify value

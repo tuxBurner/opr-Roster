@@ -67,7 +67,7 @@ class DataInitializer @Inject()(armiesCsvParser: ArmyCSVDataParser,
   private def addAbilities(csvAbilities: Set[CSVAbilityDto]): Unit = {
 
     AbilitiesDao.deleteAll()
-    csvAbilities.foreach(csvAbility => AbilitiesDao.findOrAddAbility(csvAbility.name, csvAbility.modifier, csvAbility.shootQuality))
+    csvAbilities.foreach(csvAbility => AbilitiesDao.findOrAddAbilityFromCsv(csvAbility))
   }
 
   /**

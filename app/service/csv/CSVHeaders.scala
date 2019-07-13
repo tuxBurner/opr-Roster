@@ -104,5 +104,15 @@ object CSVHeaders {
   /**
     * Header column of the shoot quality modifier
     */
-  val SHOOT_QUALITY_HEADER = "ShootQuality"
+  val SHOOT_HEADER = "Shoot"
+
+  /**
+    * Header column of the move quality modifier
+    */
+  val MOVE_HEADER = "Move"
+
+  /**
+    * Header column of the sprint quality modifier
+    */
+  val SPRINT_HEADER = "Sprint"
 }

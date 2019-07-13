@@ -144,6 +144,34 @@ class ArmyLogicSpec extends PlaySpec with GuiceOneAppPerTest with Injecting {
       armyWithName.name mustBe "Hero's of the Horde"
     }
 
+    s"ability slow on Power Armor Orc changes move and sprint stat" in {
+      val uuid = UUID.randomUUID().toString
+      getFResultDefined(armyLogic.addNewArmy(uuid, orcMarauderFaction))
+      val armyWithPowerArmorOrc = getFResultDefined(armyLogic.addTroopToArmy(uuid, "Power Armor Orc"))
+      armyWithPowerArmorOrc.troops.length mustBe 1
+      val orcWithPowerArmor = armyWithPowerArmorOrc.troops(0)
+      orcWithPowerArmor.sprint mustBe 8
+      orcWithPowerArmor.move mustBe 4
+    }
+
+    s"ability bad shot modifies shoot stat" in {
+      val uuid = UUID.randomUUID().toString
+      getFResultDefined(armyLogic.addNewArmy(uuid, orcMarauderFaction))
+      val updatedArmy = getFResultDefined(armyLogic.addTroopToArmy(uuid, "Warlord"))
+      updatedArmy.troops.length mustBe 1
+      val warLord = updatedArmy.troops(0)
+      warLord.shoot mustBe 5
+    }
+
+    s"ability good shot modifies shoot stat" in {
+      val uuid = UUID.randomUUID().toString
+      getFResultDefined(armyLogic.addNewArmy(uuid, orcMarauderFaction))
+      val updatedArmy = getFResultDefined(armyLogic.addTroopToArmy(uuid, "Goblin Herd"))
+      updatedArmy.troops.length mustBe 1
+      val goblinHerd = updatedArmy.troops(0)
+      goblinHerd.shoot mustBe 4
+    }
+
   }
 
   /**

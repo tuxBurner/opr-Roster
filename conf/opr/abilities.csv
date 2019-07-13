@@ -1,36 +1,36 @@
-Name;Modifier;ShootQuality
-Blast;X;
-Deadly;X;
-Fast;;
-Fear;;
-Fearless;;
-Flying;;
-Furious;;
-Hero;;
-Immobile;;
-Impact;X;
-Indirect;;
-Mend;;
-Poison;;
-Psychic;X;
-Regeneration;;
-Rending;;
-Scout;;
-Slow;;
-Sniper;;
-Stealth;;
-Strider;;
-Tough;X;
-Advanced Tactics;;
-Battle Standard;;
-Medical Training;;
-Shield Wall;;
-Veteran Infantery;;
-War Chant;;
-Bad Shot;;5
-Doctor;;
-Energy Field;;
-Good Shot;;4
-WAR!;X;
-PickOneEachTurn;;
-Ambush;;
+Name;Modifier;Shoot;Move;Sprint
+Blast;X;;;
+Deadly;X;;;
+Fast;;;9;18
+Fear;;;;
+Fearless;;;;
+Flying;;;;
+Furious;;;;
+Hero;;;;
+Immobile;;;;
+Impact;X;;;
+Indirect;;;;
+Mend;;;;
+Poison;;;;
+Psychic;X;;;
+Regeneration;;;;
+Rending;;;;
+Scout;;;;
+Slow;;;4;8
+Sniper;;;;
+Stealth;;;;
+Strider;;;;
+Tough;X;;;
+Advanced Tactics;;;;
+Battle Standard;;;;
+Medical Training;;;;
+Shield Wall;;;;
+Veteran Infantery;;;;
+War Chant;;;;
+Bad Shot;;5;;
+Doctor;;;;
+Energy Field;;;;
+Good Shot;;4;;
+WAR!;X;;;
+PickOneEachTurn;;;;
+Ambush;;;;

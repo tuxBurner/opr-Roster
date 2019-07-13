@@ -5,7 +5,7 @@ import java.util.UUID
 import javax.inject.{Inject, Singleton}
 import play.api.Logger
 import play.api.cache.AsyncCacheApi
-import service.models.{AbilityWithModifyValueDo, FactionsDao, ItemDo, TroopDao, TroopDo, WeaponDo}
+import service.models._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -22,6 +22,7 @@ class ArmyLogic @Inject()(cache: AsyncCacheApi) {
     * Logger for the army logic
     */
   val LOGGER = Logger(classOf[ArmyLogic])
+
 
   /**
     * Adds a new army
@@ -228,15 +229,32 @@ class ArmyLogic @Inject()(cache: AsyncCacheApi) {
     * @return the troop with the changed values
     */
   private def applyTroopChangeValues(troopDto: TroopDto): TroopDto = {
-    // check if we have an ability which modfifies the shoot quality
-    val shootQuality = troopDto.currentAbilities
-      .find(_.shootQuality >= 0)
+    // check if we have an ability which modifies the shoot quality
+    val shoot = troopDto.currentAbilities
+      .find(_.shoot > 0)
       .map(ability => {
-        LOGGER.info(s"Changed troop: ${troopDto.name} shoot quality from: ${troopDto.basicQuality} to: ${ability.shootQuality} cause of ability: ${ability.name}")
-        ability.shootQuality
+        LOGGER.info(s"Changed troop: ${troopDto.name} shoot from: ${troopDto.basicQuality} to: ${ability.shoot} cause of ability: ${ability.name}")
+        ability.shoot
       })
       .getOrElse(troopDto.basicQuality)
 
+    // check if we have an ability which modifies the move
+    val move = troopDto.currentAbilities
+      .find(_.move > 0)
+      .map(ability => {
+        LOGGER.info(s"Changed troop: ${troopDto.name} move from: ${troopDto.move} to: ${ability.move} cause of ability: ${ability.name}")
+        ability.move
+      })
+      .getOrElse(6)
+
+    // check if we have an ability which modifies the move
+    val sprint = troopDto.currentAbilities
+      .find(_.sprint > 0)
+      .map(ability => {
+        LOGGER.info(s"Changed troop: ${troopDto.name} sprint from: ${troopDto.sprint} to: ${ability.sprint} cause of ability: ${ability.name}")
+        ability.sprint
+      })
+      .getOrElse(12)
 
     // check if the troop has an item which modifies the defense
     val defense = troopDto.currentItems
@@ -247,10 +265,10 @@ class ArmyLogic @Inject()(cache: AsyncCacheApi) {
       })
       .getOrElse(troopDto.basicDefense)
 
-
-
-    troopDto.copy(shoot = shootQuality,
-      defense = defense)
+    troopDto.copy(shoot = shoot,
+      defense = defense,
+      move = move,
+      sprint = sprint)
   }
 
 
@@ -278,7 +296,9 @@ class ArmyLogic @Inject()(cache: AsyncCacheApi) {
   private def abilityDoToDto(abilityDo: AbilityWithModifyValueDo): AbilityDto = {
     AbilityDto(name = abilityDo.ability.name,
       modifier = abilityDo.modifyValue,
-      shootQuality = abilityDo.ability.shootQuality)
+      shoot = abilityDo.ability.shoot,
+      move = abilityDo.ability.move,
+      sprint = abilityDo.ability.sprint)
   }
 
   /**
@@ -344,8 +364,8 @@ case class TroopDto(uuid: String,
                     defense: Int = 0,
                     shoot: Int = 0,
                     fight: Int = 0,
-                    move: Int = 3,
-                    sprint: Int = 3,
+                    move: Int = 6,
+                    sprint: Int = 12,
                     currentWeapons: Set[WeaponDto],
                     currentAbilities: Set[AbilityDto],
                     currentItems: Set[ItemDto],
@@ -383,10 +403,14 @@ case class ItemDto(name: String,
 /**
   * Represents an ability
   *
-  * @param name         the name of the ability
-  * @param modifier     the modify value of the ability
-  * @param shootQuality when not 0 the shoot quality of the troop is changed
+  * @param name     the name of the ability
+  * @param modifier the modify value of the ability
+  * @param shoot    when not 0 the shoot quality of the troop is changed
+  * @param move     when not 0 the move of the troop is changed
+  * @param sprint   when not 0 the sprint of the troop is changed
   */
 case class AbilityDto(name: String,
                       modifier: Option[Int],
-                      shootQuality: Int)
+                      shoot: Int,
+                      move: Int,
+                      sprint: Int)

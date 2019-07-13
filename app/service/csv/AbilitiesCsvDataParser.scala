@@ -21,10 +21,14 @@ class AbilitiesCsvDataParser @Inject()(configuration: Configuration) extends CSV
       .flatMap(info => {
         val name = info._1(CSVHeaders.NAME_HEADER)
         val modifier = info._1(CSVHeaders.MODIFIER_HEADER).toUpperCase == "X"
-        val shootQuality = readCsvLineToIntWithDefault(CSVHeaders.SHOOT_QUALITY_HEADER,info)
+        val shoot = readCsvLineToIntWithDefault(CSVHeaders.SHOOT_HEADER, info)
+        val move = readCsvLineToIntWithDefault(CSVHeaders.MOVE_HEADER, info)
+        val sprint = readCsvLineToIntWithDefault(CSVHeaders.SPRINT_HEADER, info)
         Some(CSVAbilityDto(name = name,
           modifier = modifier,
-          shootQuality = shootQuality))
+          shoot = shoot,
+          move = move,
+          sprint = sprint))
       }).toSet
   }
 }
@@ -32,10 +36,14 @@ class AbilitiesCsvDataParser @Inject()(configuration: Configuration) extends CSV
 /**
   * Represents an ability from the csv
   *
-  * @param name         the name of the ability
-  * @param modifier     if the ability has a modifier
-  * @param shootQuality when not 0 the shoot quality of the troop changes
+  * @param name     the name of the ability
+  * @param modifier if the ability has a modifier
+  * @param shoot    when not 0 the shoot quality of the troop changes
+  * @param move     when not 0 the move of the troop changes
+  * @param sprint   when not 0 the sprint of the troop changes  *
   */
 case class CSVAbilityDto(name: String,
                          modifier: Boolean,
-                         shootQuality: Int)
+                         shoot: Int,
+                         move: Int,
+                         sprint: Int)
