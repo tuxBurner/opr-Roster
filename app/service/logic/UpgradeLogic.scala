@@ -2,7 +2,7 @@ package service.logic
 
 import javax.inject.{Inject, Singleton}
 import play.api.Logger
-import service.models.{EUpgradeRuleType, UpgradeRuleDo, UpgradeRuleOptionDo, UpgradesDao}
+import service.models.{EUpgradeRuleType, UpgradeRuleDo, UpgradeRuleOptionDo, UpgradesDao, WeaponDao}
 
 import scala.concurrent.Future
 
@@ -73,7 +73,7 @@ class UpgradeLogic @Inject()(armyLogic: ArmyLogic) {
         amount = rule.amount,
         options = rule.options.map(upgradeOptionDoToDto)))
     } else {
-      LOGGER.info(s"Cannot use attachement for subject: ${rule.subjects.map(_.linkedName).mkString} it is not equipped by the troop: ${troopDto.name}  ${troopDto.currentWeapons.map(_.linkedName).mkString}")
+      LOGGER.info(s"Cannot use attachment for subject: ${rule.subjects.map(_.linkedName).mkString} it is not equipped by the troop: ${troopDto.name}  ${troopDto.currentWeapons.map(_.linkedName).mkString}")
       None
     }
   }
@@ -123,8 +123,26 @@ class UpgradeLogic @Inject()(armyLogic: ArmyLogic) {
     * @param troopUuid the uuid of the troop
     * @return
     */
-  def setUpgradesOnTroop(armyUuid: String, troopUuid: String): Future[Option[ArmyDto]] = {
-    ???
+  def setReplacementOnTroop(armyUuid: String, troopUuid: String, replace: SetReplacementOption): Future[Option[ArmyDto]] = {
+    armyLogic.getArmyAndTroopForUpdate(armyUuid,troopUuid,(army,troop) => {
+      val troopsWeapon = troop.
+        currentWeapons.flatMap(weapon => {
+         if(replace.subjects.contains(weapon.linkedName)) {
+           None
+         } else {
+           Some(weapon)
+         }
+      })
+
+      val newWeapons = replace.replaceWith.weapons
+        .map(WeaponDao.findWeaponByLinkedNameAndFactionName(_,army.factionName))
+          .flatten
+          .map(armyLogic.weaponDoToDto(_))
+
+      val weaponsToSet = troopsWeapon ++ newWeapons
+      //Some(troop.copy())
+      None
+    },(army) => Some(army))
   }
 
   /**
@@ -196,3 +214,10 @@ case class UpgradeOptionDto(costs: Int,
 case class TroopPossibleUpgradesDto(replacements: List[UpgradeReplaceDto],
                                     upgrades: List[UpgradeUpgradeDto],
                                     attachments: List[UpgradeAttachmentDto])
+
+case class SetReplacementOption(subjects: Set[String],
+                                replaceWith: SetEquipment)
+
+case class SetEquipment(weapons: Set[String] = Set.empty,
+                        items: Set[String] = Set.empty,
+                        abilities: Set[String] = Set.empty)

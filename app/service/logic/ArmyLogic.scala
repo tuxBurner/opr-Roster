@@ -129,7 +129,8 @@ class ArmyLogic @Inject()(cache: AsyncCacheApi) {
           }
         })
 
-        Some(army.copy(troops = newTroops, totalCosts = calcTotalArmyCosts(newTroops)))
+        val updatedArmy = army.copy(troops = newTroops, totalCosts = calcTotalArmyCosts(newTroops))
+        Some(setArmyToCache(updatedArmy))
       }
     }, (army) => Some(army))
   }
@@ -144,7 +145,9 @@ class ArmyLogic @Inject()(cache: AsyncCacheApi) {
   def setArmyName(armyUuid: String, armyName: String): Future[Option[ArmyDto]] = {
     getArmy(armyUuid)
       .map(armyOption => {
-        armyOption.map(armyFromCache => armyFromCache.copy(name = armyName))
+        armyOption.map(armyFromCache => {
+          setArmyToCache(armyFromCache.copy(name = armyName))
+        })
       })
   }
 
@@ -159,7 +162,8 @@ class ArmyLogic @Inject()(cache: AsyncCacheApi) {
   def removeTroopFromArmy(armyUuid: String, troopUuid: String): Future[Option[ArmyDto]] = {
     getArmyAndTroopForUpdate(armyUuid, troopUuid, (army, troop) => {
       val newTroops = army.troops.filterNot(_.uuid == troop.uuid)
-      Some(army.copy(troops = newTroops, totalCosts = calcTotalArmyCosts(newTroops)))
+      val updatedArmy = army.copy(troops = newTroops, totalCosts = calcTotalArmyCosts(newTroops))
+      Some(setArmyToCache(updatedArmy))
     }, (army) => Some(army))
   }
 

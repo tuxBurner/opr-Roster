@@ -98,6 +98,11 @@ class ArmyLogicSpec extends BasicOprLogicSpec {
       changedArmy.troops.length mustBe 1
       changedArmy.troops(0).amount mustBe 10
       changedArmy.totalCosts mustBe 500
+
+      val armyFromCache = getFResultDefined(armyLogic.getArmy(uuid))
+      armyFromCache.troops.length mustBe 1
+      armyFromCache.troops(0).amount mustBe 10
+      armyFromCache.totalCosts mustBe 500
     }
 
     s"remove troop from army works" in {
@@ -114,6 +119,9 @@ class ArmyLogicSpec extends BasicOprLogicSpec {
       removedTroopArmy.troops.length mustBe 1
       removedTroopArmy.troops.exists(_.uuid == troopUuidToRemove) mustBe false
       removedTroopArmy.totalCosts mustBe 50
+
+      val armyFromCache = getFResultDefined(armyLogic.getArmy(uuid))
+      armyFromCache.troops.length mustBe 1
     }
 
     s"cannot set name on army which does not exists" in {
@@ -126,6 +134,9 @@ class ArmyLogicSpec extends BasicOprLogicSpec {
       army.name mustBe empty
       val armyWithName = getFResultDefined(armyLogic.setArmyName(uuid, "Hero's of the Horde"))
       armyWithName.name mustBe "Hero's of the Horde"
+
+      val armyFromCache = getFResultDefined(armyLogic.getArmy(uuid))
+      armyFromCache.name mustBe "Hero's of the Horde"
     }
 
     s"ability slow on changes move and sprint stat" in {
