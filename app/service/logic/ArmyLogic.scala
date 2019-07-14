@@ -53,6 +53,7 @@ class ArmyLogic @Inject()(cache: AsyncCacheApi) {
     */
   def setArmyToCache(armyDto: ArmyDto): ArmyDto = {
     // TODO: configure duration
+    LOGGER.info(s"Setting army: ${armyDto.uuid} to the cache for 15 minutes")
     cache.sync.set(armyDto.uuid, armyDto, 15.minutes)
     armyDto
   }
@@ -65,6 +66,7 @@ class ArmyLogic @Inject()(cache: AsyncCacheApi) {
     * @return the army from the cache or [[None]] when not found
     */
   def getArmy(uuid: String): Future[Option[ArmyDto]] = {
+    LOGGER.info(s"Trying to get army: $uuid from cache")
     cache.get(uuid)
   }
 
@@ -129,7 +131,7 @@ class ArmyLogic @Inject()(cache: AsyncCacheApi) {
 
         Some(army.copy(troops = newTroops, totalCosts = calcTotalArmyCosts(newTroops)))
       }
-    })
+    }, (army) => Some(army))
   }
 
   /**
@@ -158,37 +160,42 @@ class ArmyLogic @Inject()(cache: AsyncCacheApi) {
     getArmyAndTroopForUpdate(armyUuid, troopUuid, (army, troop) => {
       val newTroops = army.troops.filterNot(_.uuid == troop.uuid)
       Some(army.copy(troops = newTroops, totalCosts = calcTotalArmyCosts(newTroops)))
-    })
+    }, (army) => Some(army))
   }
 
   /**
     * Gets the army by the uuid and the troop in the army by the uuid and when found both of them applies them on the changeArmyFun
     *
-    * @param armyUuid      the uuid of the army
-    * @param troopUuid     the troop uuid
-    * @param changeArmyFun function to apply on the army and troop when both where found
-    * @return [[None]] when the army was not found else [[ArmyDto]] which was changed or not
+    * @param armyUuid         the uuid of the army
+    * @param troopUuid        the troop uuid
+    * @param troopFoundFun    function to apply on the army and troop when both where found
+    * @param troopNotFoundFun function which is called when the troop was not found in the army
+    * @tparam T the type which to return
+    * @return [[None]] when the army was not found else [[T]] which was changed or not
+    *
     */
-  def getArmyAndTroopForUpdate(armyUuid: String, troopUuid: String, changeArmyFun: (ArmyDto, TroopDto) => Option[ArmyDto]): Future[Option[ArmyDto]] = getArmy(armyUuid)
-    .map(armyOption => {
-      armyOption.map(army => {
-        // check if the troop is in the army an when so apply the changeArmyFun
-        army
-          .troops
-          .find(_.uuid == troopUuid)
-          .map(troop => {
-            changeArmyFun(army, troop)
-          })
+  def getArmyAndTroopForUpdate[T](armyUuid: String, troopUuid: String, troopFoundFun: (ArmyDto, TroopDto) => Option[T], troopNotFoundFun: (ArmyDto) => Option[T]): Future[Option[T]] = {
+    getArmy(armyUuid)
+      .map(armyOption => {
+        armyOption.map(army => {
+          // check if the troop is in the army an when so apply the changeArmyFun
+          army
+            .troops
+            .find(_.uuid == troopUuid)
+            .map(troop => {
+              troopFoundFun(army, troop)
+            })
+            .getOrElse({
+              LOGGER.error(s"Cannot perform change on troop: $troopUuid was not found in army: $armyUuid")
+              troopNotFoundFun(army)
+            })
+        })
           .getOrElse({
-            LOGGER.error(s"Cannot perform change on troop: $troopUuid was not found in army: $armyUuid")
-            Some(army)
+            LOGGER.error(s"Could not perform change on army: $armyUuid was not found in cache")
+            None
           })
       })
-        .getOrElse({
-          LOGGER.error(s"Could not perform change on army: $armyUuid was not found in cache")
-          None
-        })
-    })
+  }
 
 
   /**
@@ -278,7 +285,7 @@ class ArmyLogic @Inject()(cache: AsyncCacheApi) {
     * @param weaponDo the weapon do to convert
     * @return the converted [[WeaponDto]]
     */
-  private def weaponDoToDto(weaponDo: WeaponDo): WeaponDto = {
+  def weaponDoToDto(weaponDo: WeaponDo): WeaponDto = {
     WeaponDto(name = weaponDo.name,
       linkedName = weaponDo.linkedName,
       range = weaponDo.range,
@@ -293,7 +300,7 @@ class ArmyLogic @Inject()(cache: AsyncCacheApi) {
     * @param abilityDo the ability do to convert
     * @return the converted [[AbilityDto]]
     */
-  private def abilityDoToDto(abilityDo: AbilityWithModifyValueDo): AbilityDto = {
+  def abilityDoToDto(abilityDo: AbilityWithModifyValueDo): AbilityDto = {
     AbilityDto(name = abilityDo.ability.name,
       modifier = abilityDo.modifyValue,
       shoot = abilityDo.ability.shoot,
@@ -307,7 +314,7 @@ class ArmyLogic @Inject()(cache: AsyncCacheApi) {
     * @param itemDo the item do to convert
     * @return the converted [[ItemDto]]
     */
-  private def itemDoToDto(itemDo: ItemDo): ItemDto = {
+  def itemDoToDto(itemDo: ItemDo): ItemDto = {
     ItemDto(name = itemDo.name,
       abilities = itemDo.abilities.map(abilityDoToDto),
       defenseModifier = itemDo.defensModifier)
