@@ -5,7 +5,6 @@ import play.api.Logger
 import service.models.{EUpgradeRuleType, UpgradeRuleDo, UpgradeRuleOptionDo, UpgradesDao}
 
 import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
   * Handles the upgrade on a troop
@@ -30,7 +29,6 @@ class UpgradeLogic @Inject()(armyLogic: ArmyLogic) {
 
     armyLogic.getArmyAndTroopForUpdate(armyUuid, troopUuid, (army, troop) => {
       val possibleUpgradeDos = UpgradesDao.getUpgradesForFactionAndNames(army.factionName, troop.possibleUpgrades)
-
 
       val replacements = possibleUpgradeDos.flatMap(upgradeDo => {
         upgradeDo.rules

@@ -1,24 +1,24 @@
 package service.logic
 
 import org.scalatestplus.play.PlaySpec
-import org.scalatestplus.play.guice.GuiceOneAppPerTest
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.test.Injecting
 import service.DataInitializer
 
+import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
 
-import scala.concurrent.duration._
+class BasicOprLogicSpec extends PlaySpec with GuiceOneAppPerSuite with Injecting {
 
-class BasicOprLogicSpec extends PlaySpec with GuiceOneAppPerTest with Injecting {
 
-  val armyLogic: ArmyLogic = fakeApplication.injector.instanceOf(classOf[ArmyLogic])
+  val armyLogic: ArmyLogic = app.injector.instanceOf(classOf[ArmyLogic])
 
-  val upgradeLogic: UpgradeLogic = fakeApplication.injector.instanceOf(classOf[UpgradeLogic])
+  val upgradeLogic: UpgradeLogic = app.injector.instanceOf(classOf[UpgradeLogic])
 
-  val dataInitalizer: DataInitializer = fakeApplication.injector.instanceOf(classOf[DataInitializer])
+  val dataInitializer: DataInitializer = app.injector.instanceOf(classOf[DataInitializer])
 
   // init the data
-  dataInitalizer.initData()
+  dataInitializer.initData()
 
   /**
     * Name of the orc marauders faction

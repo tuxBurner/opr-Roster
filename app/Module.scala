@@ -1,7 +1,7 @@
 import com.google.inject.AbstractModule
 import service.DataInitializer
 import service.csv.{AbilitiesCsvDataParser, ArmyCSVDataParser, UpgradesCsvDataParser, WeaponCsvDataParser}
-import service.logic.ArmyLogic
+import service.logic.{ArmyLogic, UpgradeLogic}
 
 /**
   * Module which handles the injection of the self written modules
@@ -21,6 +21,7 @@ class Module extends AbstractModule {
 
     // bind the logics
     bind(classOf[ArmyLogic]).asEagerSingleton()
+    bind(classOf[UpgradeLogic]).asEagerSingleton()
   }
 
 }
