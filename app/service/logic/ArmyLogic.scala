@@ -121,18 +121,32 @@ class ArmyLogic @Inject()(cache: AsyncCacheApi) {
         LOGGER.error(s"Cannot set amount: $amount <= 0 on troop: $troopUuid in army: $armyUuid")
         Some(army)
       } else {
-        val newTroops = army.troops.map(troopInArmy => {
-          if (troopInArmy.uuid != troop.uuid) {
-            troopInArmy
-          } else {
-            troopInArmy.copy(amount = amount)
-          }
-        })
-
-        val updatedArmy = army.copy(troops = newTroops, totalCosts = calcTotalArmyCosts(newTroops))
-        Some(setArmyToCache(updatedArmy))
+        Some(updateTroopInArmyAndSetToCache(army, troopUuid, (troop) => {
+          troop.copy(amount = amount)
+        }))
       }
     }, (army) => Some(army))
+  }
+
+  /**
+    * Changes the troop in the army and writes the army to the cache
+    *
+    * @param armyDto        the army to handle
+    * @param troopUuid      the uuid of the troop to change
+    * @param updateTroopFun the function which changes the troop
+    * @return the army from the cache
+    */
+  def updateTroopInArmyAndSetToCache(armyDto: ArmyDto, troopUuid: String, updateTroopFun: (TroopDto) => TroopDto): ArmyDto = {
+    val newTroops = armyDto.troops.map(troopInArmy => {
+      if (troopInArmy.uuid != troopUuid) {
+        troopInArmy
+      } else {
+        updateTroopFun(troopInArmy)
+      }
+    })
+
+    val updatedArmy = armyDto.copy(troops = newTroops, totalCosts = calcTotalArmyCosts(newTroops))
+    setArmyToCache(updatedArmy)
   }
 
   /**

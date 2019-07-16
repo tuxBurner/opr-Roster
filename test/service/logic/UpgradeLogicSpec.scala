@@ -30,6 +30,19 @@ class UpgradeLogicSpec extends BasicOprLogicSpec {
 
       getFResultDefined(upgradeLogic.getPossibleUpdatesForTroop(uuid, troopUuid))
     }
+
+    "replace the pistol on the orc with carabine" in {
+      val uuid = UUID.randomUUID().toString
+      getFResultDefined(armyLogic.addNewArmy(uuid, orcMarauderFaction))
+      val armyWithTroop = getFResultDefined(armyLogic.addTroopToArmy(uuid, "Orc"))
+
+      val troopUuid = armyWithTroop.troops(0).uuid
+
+      val upgrades = getFResultDefined(upgradeLogic.getPossibleUpdatesForTroop(uuid, troopUuid))
+      upgrades.replacements.length mustBe 1
+
+      //upgradeLogic.setReplacementOnTroop(uuid,troopUuid)
+    }
   }
 
 }

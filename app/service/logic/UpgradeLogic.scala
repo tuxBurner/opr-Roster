@@ -26,34 +26,43 @@ class UpgradeLogic @Inject()(armyLogic: ArmyLogic) {
     * @return all the possible upgrade options the troop has
     */
   def getPossibleUpdatesForTroop(armyUuid: String, troopUuid: String): Future[Option[TroopPossibleUpgradesDto]] = {
-
     armyLogic.getArmyAndTroopForUpdate(armyUuid, troopUuid, (army, troop) => {
-      val possibleUpgradeDos = UpgradesDao.getUpgradesForFactionAndNames(army.factionName, troop.possibleUpgrades)
-
-      val replacements = possibleUpgradeDos.flatMap(upgradeDo => {
-        upgradeDo.rules
-          .filter(_.ruleType == EUpgradeRuleType.Replace)
-          .map(getReplaceOption(troop, _))
-      })
-        .flatten
-
-      val upgrades = possibleUpgradeDos.flatMap(upgradeDo => {
-        upgradeDo.rules
-          .filter(_.ruleType == EUpgradeRuleType.Upgrade)
-          .map(getUpgradeOption(_))
-      })
-
-      val attachments = possibleUpgradeDos.flatMap(upgradeDo => {
-        upgradeDo.rules
-          .filter(_.ruleType == EUpgradeRuleType.Upgrade)
-          .map(getAttachmentOption(troop, _))
-      })
-        .flatten
-
-      Some(TroopPossibleUpgradesDto(replacements = replacements,
-        upgrades = upgrades,
-        attachments = attachments))
+      Some(calculateUpdatesForTroop(army.factionName, troop))
     }, _ => None)
+  }
+
+  /**
+    * Calculates all the possible upgrades the troop can have
+    *
+    * @param factionName the name of the faction
+    * @param troopDto    the troop to get the possible upgrades for
+    * @return the possible upgrades for the troop
+    */
+  private def calculateUpdatesForTroop(factionName: String, troopDto: TroopDto): TroopPossibleUpgradesDto = {
+    val possibleUpgradeDos = UpgradesDao.getUpgradesForFactionAndNames(factionName, troopDto.possibleUpgrades)
+    val replacements = possibleUpgradeDos.flatMap(upgradeDo => {
+      upgradeDo.rules
+        .filter(_.ruleType == EUpgradeRuleType.Replace)
+        .map(getReplaceOption(troopDto, _))
+    })
+      .flatten
+
+    val upgrades = possibleUpgradeDos.flatMap(upgradeDo => {
+      upgradeDo.rules
+        .filter(_.ruleType == EUpgradeRuleType.Upgrade)
+        .map(getUpgradeOption(_))
+    })
+
+    val attachments = possibleUpgradeDos.flatMap(upgradeDo => {
+      upgradeDo.rules
+        .filter(_.ruleType == EUpgradeRuleType.Upgrade)
+        .map(getAttachmentOption(troopDto, _))
+    })
+      .flatten
+
+    TroopPossibleUpgradesDto(replacements = replacements,
+      upgrades = upgrades,
+      attachments = attachments)
   }
 
   /**
@@ -124,25 +133,30 @@ class UpgradeLogic @Inject()(armyLogic: ArmyLogic) {
     * @return
     */
   def setReplacementOnTroop(armyUuid: String, troopUuid: String, replace: SetReplacementOption): Future[Option[ArmyDto]] = {
-    armyLogic.getArmyAndTroopForUpdate(armyUuid,troopUuid,(army,troop) => {
-      val troopsWeapon = troop.
-        currentWeapons.flatMap(weapon => {
-         if(replace.subjects.contains(weapon.linkedName)) {
-           None
-         } else {
-           Some(weapon)
-         }
-      })
+    armyLogic.getArmyAndTroopForUpdate(armyUuid, troopUuid, (army, troop) => {
 
-      val newWeapons = replace.replaceWith.weapons
-        .map(WeaponDao.findWeaponByLinkedNameAndFactionName(_,army.factionName))
-          .flatten
+      val army2 = armyLogic.updateTroopInArmyAndSetToCache(army, troop.uuid, (troop) => {
+
+        val troopsWeapon = troop.
+          currentWeapons.flatMap(weapon => {
+          if (replace.subjects.contains(weapon.linkedName)) {
+            None
+          } else {
+            Some(weapon)
+          }
+        })
+
+        val newWeapons = replace.replaceWith.weapons
+          .flatMap(WeaponDao.findWeaponByLinkedNameAndFactionName(_, army.factionName))
           .map(armyLogic.weaponDoToDto(_))
 
-      val weaponsToSet = troopsWeapon ++ newWeapons
-      //Some(troop.copy())
-      None
-    },(army) => Some(army))
+        val weaponsToSet = troopsWeapon ++ newWeapons
+        troop.copy(currentWeapons = weaponsToSet)
+      })
+
+      Some(army2)
+
+    }, (army) => Some(army))
   }
 
   /**
