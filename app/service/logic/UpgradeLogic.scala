@@ -55,7 +55,7 @@ class UpgradeLogic @Inject()(armyLogic: ArmyLogic) {
 
     val attachments = possibleUpgradeDos.flatMap(upgradeDo => {
       upgradeDo.rules
-        .filter(_.ruleType == EUpgradeRuleType.Upgrade)
+        .filter(_.ruleType == EUpgradeRuleType.Attachement)
         .map(getAttachmentOption(troopDto, _))
     })
       .flatten
@@ -82,7 +82,7 @@ class UpgradeLogic @Inject()(armyLogic: ArmyLogic) {
         amount = rule.amount,
         options = rule.options.map(upgradeOptionDoToDto)))
     } else {
-      LOGGER.info(s"Cannot use attachment for subject: ${rule.subjects.map(_.linkedName).mkString} it is not equipped by the troop: ${troopDto.name}  ${troopDto.currentWeapons.map(_.linkedName).mkString}")
+      LOGGER.info(s"Cannot use attachment for subject: ${rule.subjects.map(_.linkedName).mkString("/")} it is not equipped by the troop: ${troopDto.name}  ${troopDto.currentWeapons.map(_.linkedName).mkString("/")}")
       None
     }
   }
@@ -114,7 +114,7 @@ class UpgradeLogic @Inject()(armyLogic: ArmyLogic) {
       }))
 
     if (filteredWeapons.size != rule.subjects.size) {
-      LOGGER.info(s"Cannot use ${rule.ruleType} subjects: ${rule.subjects.map(_.linkedName).mkString} are not in the current weapons of troop: ${troopDto.name} ${troopDto.currentWeapons.map(_.linkedName).mkString}")
+      LOGGER.info(s"Cannot use ${rule.ruleType} subjects: ${rule.subjects.map(_.linkedName).mkString("/")} are not in the current weapons of troop: ${troopDto.name} ${troopDto.currentWeapons.map(_.linkedName).mkString("/")}")
       None
     } else {
       val upgradeReplaceDto = UpgradeReplaceDto(subjects = rule.subjects.map(armyLogic.weaponDoToDto),

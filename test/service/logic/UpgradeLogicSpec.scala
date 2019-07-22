@@ -31,13 +31,14 @@ class UpgradeLogicSpec extends BasicOprLogicSpec {
 
       // check the default options
       val upgrades = getFResultDefined(upgradeLogic.getPossibleUpdatesForTroop(uuid, troopUuid))
-      upgrades.replacements.length mustBe 2
+      upgrades.replacements.length mustBe 3
       upgrades.attachments mustBe empty
       upgrades.upgrades.length mustBe 1
       upgrades.upgrades.exists(upgrade => upgrade.options.exists(_.uuid == "Orc Marauders_O_Upgrade__1_Heavy Armor_5")) mustBe true
 
       upgrades.replacements.exists(replacement => replacement.options.exists(_.uuid == "Orc Marauders_A_Replace_Pistol_0_Twin Carbine_10")) mustBe true
       upgrades.replacements.exists(replacement => replacement.options.exists(_.uuid == "Orc Marauders_A_Replace_Pistol_0_Carbine_5")) mustBe true
+      upgrades.replacements.exists(replacement => replacement.options.exists(_.uuid == "Orc Marauders_A_Replace_CCW2_0_Energy Sword_10")) mustBe true
       upgrades.replacements.exists(replacement => replacement.options.exists(_.uuid == "Orc Marauders_O_Replace_Pistol_0_Heavy Machinegun_15")) mustBe true
     }
 
@@ -68,11 +69,16 @@ class UpgradeLogicSpec extends BasicOprLogicSpec {
       val replacementUUId = "Orc Marauders_A_Replace_Pistol_0_Carbine_5"
       val updatedArmy = getFResultDefined(upgradeLogic.setReplacementOnTroop(uuid,troopUuid, replacementUUId))
 
+      val changedTroop = updatedArmy.troops.head
+      changedTroop.currentWeapons.size mustBe 2
+      changedTroop.currentWeapons.exists(_.linkedName == "Carbine") mustBe true
+      changedTroop.currentWeapons.exists(_.linkedName == "CCW2") mustBe true
 
-      val notChangedTroop = updatedArmy.troops.head
-      notChangedTroop.currentWeapons.size mustBe 2
-      notChangedTroop.currentWeapons.exists(_.linkedName == "Carbine") mustBe true
-      notChangedTroop.currentWeapons.exists(_.linkedName == "CCW2") mustBe true
+      // check if we have attachments now
+      val upgrades = getFResultDefined(upgradeLogic.getPossibleUpdatesForTroop(uuid, troopUuid))
+      upgrades.attachments.length mustBe 1
+
+
     }
 
 

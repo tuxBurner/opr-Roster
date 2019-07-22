@@ -1,7 +1,7 @@
 Faction;Upgrades;Rule;Subjects;Amount;With;With Type;Costs
 Orc Marauders;A;Replace;Pistol;;Carbine;W;5
 Orc Marauders;A;;;;Twin Carbine;W;10
-Orc Marauders;A;Replace;CCW;;CCW3;W;5
+Orc Marauders;A;Replace;CCW2;;CCW3;W;5
 Orc Marauders;A;;;;Energy Sword;W;10
 Orc Marauders;A;;;;Energy Fist;W;15
 Orc Marauders;A;Attachement;Carbine;1;Heavy Flamethrower;W;15
