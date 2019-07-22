@@ -25,15 +25,6 @@ class UpgradeLogicSpec extends BasicOprLogicSpec {
     "return something when the troop is known" in {
       val uuid = UUID.randomUUID().toString
       getFResultDefined(armyLogic.addNewArmy(uuid, orcMarauderFaction))
-      val armyWithTroop = getFResultDefined(armyLogic.addTroopToArmy(uuid, orcWarlordName))
-      val troopUuid = armyWithTroop.troops.head.uuid
-
-      getFResultDefined(upgradeLogic.getPossibleUpdatesForTroop(uuid, troopUuid))
-    }
-
-    "replace the pistol on the orc with carabine" in {
-      val uuid = UUID.randomUUID().toString
-      getFResultDefined(armyLogic.addNewArmy(uuid, orcMarauderFaction))
       val armyWithTroop = getFResultDefined(armyLogic.addTroopToArmy(uuid, "Orc"))
 
       val troopUuid = armyWithTroop.troops.head.uuid
@@ -43,14 +34,48 @@ class UpgradeLogicSpec extends BasicOprLogicSpec {
       upgrades.replacements.length mustBe 2
       upgrades.attachments mustBe empty
       upgrades.upgrades.length mustBe 1
-      upgrades.upgrades.exists(upgrade =>  upgrade.options.exists(_.uuid == "Orc Marauders_O_Upgrade__1_Heavy Armor_5")) mustBe true
+      upgrades.upgrades.exists(upgrade => upgrade.options.exists(_.uuid == "Orc Marauders_O_Upgrade__1_Heavy Armor_5")) mustBe true
 
       upgrades.replacements.exists(replacement => replacement.options.exists(_.uuid == "Orc Marauders_A_Replace_Pistol_0_Twin Carbine_10")) mustBe true
       upgrades.replacements.exists(replacement => replacement.options.exists(_.uuid == "Orc Marauders_A_Replace_Pistol_0_Carbine_5")) mustBe true
       upgrades.replacements.exists(replacement => replacement.options.exists(_.uuid == "Orc Marauders_O_Replace_Pistol_0_Heavy Machinegun_15")) mustBe true
-
-      //upgradeLogic.setReplacementOnTroop(uuid,troopUuid)
     }
+
+    "cannot set unknown replacement" in {
+      val uuid = UUID.randomUUID().toString
+      getFResultDefined(armyLogic.addNewArmy(uuid, orcMarauderFaction))
+      val armyWithTroop = getFResultDefined(armyLogic.addTroopToArmy(uuid, "Orc"))
+
+      val troopUuid = armyWithTroop.troops.head.uuid
+
+      val replacementUUId = "Not Known"
+      val updatedArmy = getFResultDefined(upgradeLogic.setReplacementOnTroop(uuid,troopUuid, replacementUUId))
+
+
+      val notChangedTroop = updatedArmy.troops.head
+      notChangedTroop.currentWeapons.size mustBe 2
+      notChangedTroop.currentWeapons.exists(_.linkedName == "Pistol") mustBe true
+      notChangedTroop.currentWeapons.exists(_.linkedName == "CCW2") mustBe true
+    }
+
+    "set replacement Orc Marauders_A_Replace_Pistol_0_Carbine_5" in {
+      val uuid = UUID.randomUUID().toString
+      getFResultDefined(armyLogic.addNewArmy(uuid, orcMarauderFaction))
+      val armyWithTroop = getFResultDefined(armyLogic.addTroopToArmy(uuid, "Orc"))
+
+      val troopUuid = armyWithTroop.troops.head.uuid
+
+      val replacementUUId = "Orc Marauders_A_Replace_Pistol_0_Carbine_5"
+      val updatedArmy = getFResultDefined(upgradeLogic.setReplacementOnTroop(uuid,troopUuid, replacementUUId))
+
+
+      val notChangedTroop = updatedArmy.troops.head
+      notChangedTroop.currentWeapons.size mustBe 2
+      notChangedTroop.currentWeapons.exists(_.linkedName == "Carbine") mustBe true
+      notChangedTroop.currentWeapons.exists(_.linkedName == "CCW2") mustBe true
+    }
+
+
   }
 
 }

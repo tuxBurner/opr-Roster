@@ -128,30 +128,49 @@ class UpgradeLogic @Inject()(armyLogic: ArmyLogic) {
   /**
     * Sets the upgrades on the given troop and army
     *
-    * @param armyUuid  the uuid of the army
-    * @param troopUuid the uuid of the troop
+    * @param armyUuid    the uuid of the army
+    * @param troopUuid   the uuid of the troop
+    * @param replaceUuid the uuid of the replacement to select
     * @return
     */
-  def setReplacementOnTroop(armyUuid: String, troopUuid: String, replace: SetReplacementOption): Future[Option[ArmyDto]] = {
+  def setReplacementOnTroop(armyUuid: String, troopUuid: String, replaceUuid: String): Future[Option[ArmyDto]] = {
     armyLogic.getArmyAndTroopForUpdate(armyUuid, troopUuid, (army, troop) => {
 
-      val army2 = armyLogic.updateTroopInArmyAndSetToCache(army, troop.uuid, troop => {
+      val army2 = armyLogic.updateTroopInArmyAndSetToCache(army, troop.uuid, troopToUpdate => {
 
-        val troopsWeapon = troop.
-          currentWeapons.flatMap(weapon => {
-          if (replace.subjects.contains(weapon.linkedName)) {
-            None
-          } else {
-            Some(weapon)
-          }
+        // check if the replacement option is known for the troop
+        val upgradeOptions = calculateUpdatesForTroop(army.factionName, troopToUpdate)
+
+        val replacementOption = upgradeOptions.replacements
+          .find(replacement => replacement.options.exists(_.uuid == replaceUuid))
+
+        replacementOption.map(replacement => {
+          LOGGER.info(s"Applying replacement: $replaceUuid at troop: $troopUuid")
+
+          val troopsWeapon = troop.
+            currentWeapons.flatMap(weapon => {
+            if (replacement.subjects.exists(_.linkedName == weapon.linkedName)) {
+              None
+            } else {
+              Some(weapon)
+            }
+          })
+          val option = replacement.options.find(_.uuid == replaceUuid).get
+
+          val newWeapons = option.weapons
+            .flatMap(weaponDto => WeaponDao.findWeaponByLinkedNameAndFactionName(weaponDto.linkedName, army.factionName))
+            .map(armyLogic.weaponDoToDto)
+
+          val weaponsToSet = troopsWeapon ++ newWeapons
+          troop.copy(currentWeapons = weaponsToSet)
+
+
         })
+          .getOrElse({
+            LOGGER.error(s"Cannot find replacement: $replaceUuid for troop: $troopUuid")
+            troop
+          })
 
-        val newWeapons = replace.replaceWith.weapons
-          .flatMap(WeaponDao.findWeaponByLinkedNameAndFactionName(_, army.factionName))
-          .map(armyLogic.weaponDoToDto)
-
-        val weaponsToSet = troopsWeapon ++ newWeapons
-        troop.copy(currentWeapons = weaponsToSet)
       })
 
       Some(army2)
@@ -231,10 +250,3 @@ case class UpgradeOptionDto(uuid: String,
 case class TroopPossibleUpgradesDto(replacements: List[UpgradeReplaceDto],
                                     upgrades: List[UpgradeUpgradeDto],
                                     attachments: List[UpgradeAttachmentDto])
-
-case class SetReplacementOption(subjects: Set[String],
-                                replaceWith: SetEquipment)
-
-case class SetEquipment(weapons: Set[String] = Set.empty,
-                        items: Set[String] = Set.empty,
-                        abilities: Set[String] = Set.empty)
