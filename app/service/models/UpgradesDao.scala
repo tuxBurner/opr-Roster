@@ -24,7 +24,7 @@ object UpgradesDao {
   /**
     * Adds the given csv upgrade to the database
     *
-    * @param csvUpgrade
+    * @param csvUpgrade the upgrade information from the csv
     */
   def addUpgradeFromCsv(csvUpgrade: CSVUpgradeDto): Unit = {
 
@@ -41,19 +41,30 @@ object UpgradesDao {
     val upgradeRules = csvUpgrade.rules.flatMap(csvRule => {
       val ruleType = EUpgradeRuleType.valueOf(csvRule.ruleType)
 
+      val subjects = collectSubjects(csvRule.subjects, factionDo, csvUpgrade, ruleType)
 
       val upgradeOptions = csvRule.options.map(csvUpgradeOption => {
         val weapons = getWithWeapons(csvUpgradeOption.upgradeWith, factionDo, csvUpgrade, ruleType)
         val abilities = getWithAbilities(csvUpgradeOption.upgradeWith, factionDo, csvUpgrade, ruleType)
         val items = getWithItems(csvUpgradeOption.upgradeWith, factionDo, csvUpgrade, ruleType)
 
-        UpgradeRuleOptionDo(costs = csvUpgradeOption.costs,
+        val uniqueId = s"${csvUpgrade.factionName}_" +
+          s"${csvUpgrade.name}_" +
+          s"${ruleType.name}_" +
+          s"${subjects.map(_.linkedName).mkString("_")}" +
+          s"_${csvRule.amount}_" +
+          s"${weapons.map(_.linkedName).mkString("_")}" +
+          s"${abilities.map(ability => ability.ability.name + ability.modifyValue.getOrElse("")).mkString("_")}" +
+          s"${items.map(_.name).mkString("_")}" +
+          s"_${csvUpgradeOption.costs}"
+
+        UpgradeRuleOptionDo(uuid = uniqueId,
+          costs = csvUpgradeOption.costs,
           weapons = weapons,
           abilities = abilities,
           items = items)
       })
 
-      val subjects = collectSubjects(csvRule.subjects, factionDo, csvUpgrade, ruleType)
 
       Some(UpgradeRuleDo(ruleType = ruleType,
         subjects = subjects,
@@ -70,11 +81,12 @@ object UpgradesDao {
 
   /**
     * Gets all the upgrades for the given faction an names
-    * @param factionName the name of the faction
+    *
+    * @param factionName  the name of the faction
     * @param upgradeNames the names of the upgrades to get
     * @return [[List]] of upgrades which matches the faction and the names
     */
-  def getUpgradesForFactionAndNames(factionName: String, upgradeNames: Set[String]) : List[UpgradeDo] = {
+  def getUpgradesForFactionAndNames(factionName: String, upgradeNames: Set[String]): List[UpgradeDo] = {
     upgrades
       .filter(upgrade => upgrade.faction.name == factionName && upgradeNames.contains(upgrade.name))
       .toList
@@ -225,12 +237,14 @@ case class UpgradeRuleDo(ruleType: EUpgradeRuleType,
 /**
   * Options of an upgrade rule
   *
+  * @param uuid      the unique id of the rule
   * @param costs     how much does the rule cost
   * @param weapons   what weapon come with the option
   * @param abilities what abilities come with the option
   * @param items     what items come with the option
   */
-case class UpgradeRuleOptionDo(costs: Int,
+case class UpgradeRuleOptionDo(uuid: String,
+                               costs: Int,
                                weapons: Set[WeaponDo],
                                abilities: Set[AbilityWithModifyValueDo],
                                items: Set[ItemDo])

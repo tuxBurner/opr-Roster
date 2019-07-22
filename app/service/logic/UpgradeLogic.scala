@@ -2,7 +2,7 @@ package service.logic
 
 import javax.inject.{Inject, Singleton}
 import play.api.Logger
-import service.models.{EUpgradeRuleType, UpgradeRuleDo, UpgradeRuleOptionDo, UpgradesDao, WeaponDao}
+import service.models._
 
 import scala.concurrent.Future
 
@@ -50,7 +50,7 @@ class UpgradeLogic @Inject()(armyLogic: ArmyLogic) {
     val upgrades = possibleUpgradeDos.flatMap(upgradeDo => {
       upgradeDo.rules
         .filter(_.ruleType == EUpgradeRuleType.Upgrade)
-        .map(getUpgradeOption(_))
+        .map(getUpgradeOption)
     })
 
     val attachments = possibleUpgradeDos.flatMap(upgradeDo => {
@@ -135,7 +135,7 @@ class UpgradeLogic @Inject()(armyLogic: ArmyLogic) {
   def setReplacementOnTroop(armyUuid: String, troopUuid: String, replace: SetReplacementOption): Future[Option[ArmyDto]] = {
     armyLogic.getArmyAndTroopForUpdate(armyUuid, troopUuid, (army, troop) => {
 
-      val army2 = armyLogic.updateTroopInArmyAndSetToCache(army, troop.uuid, (troop) => {
+      val army2 = armyLogic.updateTroopInArmyAndSetToCache(army, troop.uuid, troop => {
 
         val troopsWeapon = troop.
           currentWeapons.flatMap(weapon => {
@@ -148,7 +148,7 @@ class UpgradeLogic @Inject()(armyLogic: ArmyLogic) {
 
         val newWeapons = replace.replaceWith.weapons
           .flatMap(WeaponDao.findWeaponByLinkedNameAndFactionName(_, army.factionName))
-          .map(armyLogic.weaponDoToDto(_))
+          .map(armyLogic.weaponDoToDto)
 
         val weaponsToSet = troopsWeapon ++ newWeapons
         troop.copy(currentWeapons = weaponsToSet)
@@ -156,7 +156,7 @@ class UpgradeLogic @Inject()(armyLogic: ArmyLogic) {
 
       Some(army2)
 
-    }, (army) => Some(army))
+    }, army => Some(army))
   }
 
   /**
@@ -166,7 +166,8 @@ class UpgradeLogic @Inject()(armyLogic: ArmyLogic) {
     * @return the created [[UpgradeOptionDto]]
     */
   def upgradeOptionDoToDto(upgradeOptionDo: UpgradeRuleOptionDo): UpgradeOptionDto = {
-    UpgradeOptionDto(costs = upgradeOptionDo.costs,
+    UpgradeOptionDto(uuid = upgradeOptionDo.uuid,
+      costs = upgradeOptionDo.costs,
       weapons = upgradeOptionDo.weapons.map(armyLogic.weaponDoToDto),
       abilities = upgradeOptionDo.abilities.map(armyLogic.abilityDoToDto),
       items = upgradeOptionDo.items.map(armyLogic.itemDoToDto))
@@ -208,12 +209,14 @@ case class UpgradeUpgradeDto(amount: Int,
 /**
   * Represents an option which can be chosen from
   *
+  * @param uuid      the unique id of the upgrade option
   * @param costs     how much does this option costs
   * @param weapons   what weapons does the option bring
   * @param abilities what abilities does the option bring
   * @param items     what items does the option bring
   */
-case class UpgradeOptionDto(costs: Int,
+case class UpgradeOptionDto(uuid: String,
+                            costs: Int,
                             weapons: Set[WeaponDto],
                             abilities: Set[AbilityDto],
                             items: Set[ItemDto])
@@ -223,7 +226,7 @@ case class UpgradeOptionDto(costs: Int,
   *
   * @param replacements replacements of weapons
   * @param upgrades     upgrades the troop can have
-  * @param attachments  attachements the troop can choose from
+  * @param attachments  attachments the troop can choose from
   */
 case class TroopPossibleUpgradesDto(replacements: List[UpgradeReplaceDto],
                                     upgrades: List[UpgradeUpgradeDto],
