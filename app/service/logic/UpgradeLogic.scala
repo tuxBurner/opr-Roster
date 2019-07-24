@@ -113,7 +113,10 @@ class UpgradeLogic @Inject()(armyLogic: ArmyLogic) {
         troopWeapon.linkedName == subjectWeapon.linkedName
       }))
 
-    if (filteredWeapons.size != rule.subjects.size) {
+    // check if the troop has a replacement set
+    val isSelectedRule = rule.options.exists(ruleOption => troopDto.selectedReplacements.contains(ruleOption.uuid))
+
+    if (filteredWeapons.size != rule.subjects.size && isSelectedRule == false) {
       LOGGER.info(s"Cannot use ${rule.ruleType} subjects: ${rule.subjects.map(_.linkedName).mkString("/")} are not in the current weapons of troop: ${troopDto.name} ${troopDto.currentWeapons.map(_.linkedName).mkString("/")}")
       None
     } else {
@@ -162,7 +165,7 @@ class UpgradeLogic @Inject()(armyLogic: ArmyLogic) {
             .map(armyLogic.weaponDoToDto)
 
           val weaponsToSet = troopsWeapon ++ newWeapons
-          troop.copy(currentWeapons = weaponsToSet)
+          troop.copy(currentWeapons = weaponsToSet, selectedReplacements = replaceUuid :: troop.selectedReplacements)
 
 
         })

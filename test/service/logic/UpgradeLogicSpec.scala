@@ -74,12 +74,48 @@ class UpgradeLogicSpec extends BasicOprLogicSpec {
       changedTroop.currentWeapons.exists(_.linkedName == "Carbine") mustBe true
       changedTroop.currentWeapons.exists(_.linkedName == "CCW2") mustBe true
 
+      // costs must have changed
+      changedTroop.costs mustBe 20
+
+      // check if the selected replacement is set at the troop
+      changedTroop.selectedReplacements.contains(replacementUUId) mustBe true
+
       // check if we have attachments now
       val upgrades = getFResultDefined(upgradeLogic.getPossibleUpdatesForTroop(uuid, troopUuid))
       upgrades.attachments.length mustBe 1
 
+      // replacement must be still 2 because we still have the options
+      upgrades.replacements.length mustBe 2
+    }
+
+    "replace the ccw and the pistol on an orc" in {
+      val uuid = UUID.randomUUID().toString
+      getFResultDefined(armyLogic.addNewArmy(uuid, orcMarauderFaction))
+      val armyWithTroop = getFResultDefined(armyLogic.addTroopToArmy(uuid, "Orc"))
+
+      val troopUuid = armyWithTroop.troops.head.uuid
+
+      val replacementPistolUUId = "Orc Marauders_A_Replace_Pistol_0_Carbine_5"
+      getFResultDefined(upgradeLogic.setReplacementOnTroop(uuid,troopUuid, replacementPistolUUId))
+
+      val replacementCCWUuid = "Orc Marauders_A_Replace_CCW2_0_Energy Sword_10"
+      val updatedArmy = getFResultDefined(upgradeLogic.setReplacementOnTroop(uuid,troopUuid, replacementCCWUuid))
+
+      val changedTroop = updatedArmy.troops.head
+      changedTroop.selectedReplacements.length mustBe 2
+      changedTroop.selectedReplacements.contains(replacementPistolUUId) mustBe true
+      changedTroop.selectedReplacements.contains(replacementCCWUuid) mustBe true
+
+      changedTroop.currentWeapons.exists(_.linkedName == "Carbine") mustBe true
+      changedTroop.currentWeapons.exists(_.linkedName == "Energy Sword") mustBe true
+
+      // costs must have changed
+      changedTroop.costs mustBe 30
+
 
     }
+
+    
 
 
   }

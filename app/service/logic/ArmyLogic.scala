@@ -141,7 +141,7 @@ class ArmyLogic @Inject()(cache: AsyncCacheApi) {
       if (troopInArmy.uuid != troopUuid) {
         troopInArmy
       } else {
-        updateTroopFun(troopInArmy)
+        applyTroopChangeValues(updateTroopFun(troopInArmy))
       }
     })
 
@@ -293,7 +293,36 @@ class ArmyLogic @Inject()(cache: AsyncCacheApi) {
     troopDto.copy(shoot = shoot,
       defense = defense,
       move = move,
-      sprint = sprint)
+      sprint = sprint,
+      costs = calculateSelectedUpgradeCosts(troopDto))
+  }
+
+  /**
+    * Calculates the costs of the troop by the selected attachments, replacments and upgrades
+    *
+    * @param troopDto the troop to calculate the total costs for
+    * @return the total costs of the troop
+    */
+  private def calculateSelectedUpgradeCosts(troopDto: TroopDto): Int = {
+    val replacementCosts = getTotalCostsFromSelectedUpgrades(troopDto.selectedReplacements)
+    val attachmentCosts = getTotalCostsFromSelectedUpgrades(troopDto.selectedAttachments)
+    val upgradeCosts = getTotalCostsFromSelectedUpgrades(troopDto.selectedUpgrades)
+    troopDto.basicCosts + replacementCosts + attachmentCosts + upgradeCosts
+  }
+
+  /**
+    * Parses the String and takes the last number after the last _  and sums them all up
+    *
+    * @param upgrades the upgrade string to calculate the costs for
+    * @return the total costs of the string
+    */
+  private def getTotalCostsFromSelectedUpgrades(upgrades: List[String]): Int = {
+    upgrades
+      .map(replacement => {
+        replacement.split('_')
+          .last
+          .toInt
+      }).sum
   }
 
 
@@ -360,23 +389,26 @@ case class ArmyDto(factionName: String,
 /**
   * Represents a troop which belong to an army
   *
-  * @param uuid             the uuid of the troop
-  * @param name             the name of the troop
-  * @param amount           how many are in the army
-  * @param size             the size of the troop
-  * @param basicCosts       the initial costs of the troop
-  * @param basicQuality     the basic quality stat of the troop
-  * @param basicDefense     the basic defense stat of the troop
-  * @param costs            the current costs value which the troop has after applying all updates to it
-  * @param defense          the current defense value which the troop has after applying all updates to it
-  * @param shoot            the current shoot value which the troop has after applying all updates to it
-  * @param fight            the current fight value which the troop has after applying all updates to it
-  * @param move             the current move value which the troop has after applying all updates to it
-  * @param sprint           the current sprint value which the troop has after applying all updates to it
-  * @param currentAbilities the current abilities the troop has
-  * @param currentItems     the current items the troop has
-  * @param currentWeapons   the current weapons the troop has
-  * @param possibleUpgrades the names of the upgrades the troop can use
+  * @param uuid                 the uuid of the troop
+  * @param name                 the name of the troop
+  * @param amount               how many are in the army
+  * @param size                 the size of the troop
+  * @param basicCosts           the initial costs of the troop
+  * @param basicQuality         the basic quality stat of the troop
+  * @param basicDefense         the basic defense stat of the troop
+  * @param costs                the current costs value which the troop has after applying all updates to it
+  * @param defense              the current defense value which the troop has after applying all updates to it
+  * @param shoot                the current shoot value which the troop has after applying all updates to it
+  * @param fight                the current fight value which the troop has after applying all updates to it
+  * @param move                 the current move value which the troop has after applying all updates to it
+  * @param sprint               the current sprint value which the troop has after applying all updates to it
+  * @param currentAbilities     the current abilities the troop has
+  * @param currentItems         the current items the troop has
+  * @param currentWeapons       the current weapons the troop has
+  * @param possibleUpgrades     the names of the upgrades the troop can use
+  * @param selectedReplacements the currently selected replacements
+  * @param selectedAttachments  the currently selected attachments
+  * @param selectedUpgrades     the currently selected upgrades
   */
 case class TroopDto(uuid: String,
                     name: String,
@@ -394,7 +426,10 @@ case class TroopDto(uuid: String,
                     currentWeapons: Set[WeaponDto],
                     currentAbilities: Set[AbilityDto],
                     currentItems: Set[ItemDto],
-                    possibleUpgrades: Set[String]
+                    possibleUpgrades: Set[String],
+                    selectedReplacements: List[String] = List.empty,
+                    selectedAttachments: List[String] = List.empty,
+                    selectedUpgrades: List[String] = List.empty
                    )
 
 /**
