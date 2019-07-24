@@ -45,9 +45,9 @@ object ItemDao {
     *
     * @param itemsFromCsv the strings from the csv
     * @param errorLog     the logging callback
-    * @return [[Set]] of [[ItemDo]]
+    * @return [[List]] of [[ItemDo]]
     */
-  def findItemsForCsv(itemsFromCsv: Set[String], errorLog: (String) => Unit): Set[ItemDo] = {
+  def findItemsForCsv(itemsFromCsv: List[String], errorLog: (String) => Unit): List[ItemDo] = {
     itemsFromCsv.flatMap(itemName => {
       if (itemName.isEmpty) {
         None
@@ -89,7 +89,7 @@ object ItemDao {
   * @param defensModifier the defense modifier the item provides
   */
 case class ItemDo(name: String,
-                  abilities: Set[AbilityWithModifyValueDo],
+                  abilities: List[AbilityWithModifyValueDo],
                   defensModifier: Int)
 
 

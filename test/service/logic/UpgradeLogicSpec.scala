@@ -84,8 +84,8 @@ class UpgradeLogicSpec extends BasicOprLogicSpec {
       val upgrades = getFResultDefined(upgradeLogic.getPossibleUpdatesForTroop(uuid, troopUuid))
       upgrades.attachments.length mustBe 1
 
-      // replacement must be still 2 because we still have the options
-      upgrades.replacements.length mustBe 2
+      // replacement must be still 3 because we still have the options
+      upgrades.replacements.length mustBe 3
     }
 
     "replace the ccw and the pistol on an orc" in {
@@ -111,9 +111,9 @@ class UpgradeLogicSpec extends BasicOprLogicSpec {
 
       // costs must have changed
       changedTroop.costs mustBe 30
-
-
     }
+
+   // "changing "
 
     
 

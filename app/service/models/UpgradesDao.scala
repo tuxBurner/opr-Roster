@@ -128,7 +128,7 @@ object UpgradesDao {
     * @param filterType  the type to filter with
     * @return the filtered upgrade with names
     */
-  private def filterUpgradeWithByTypeAndGetNames(upgradeWith: Set[CSVUpgradeWithDTO], filterType: EUpgradeWithType): Set[String] = {
+  private def filterUpgradeWithByTypeAndGetNames(upgradeWith: List[CSVUpgradeWithDTO], filterType: EUpgradeWithType): List[String] = {
     upgradeWith
       .filter(_.withType == filterType.csvKey)
       .map(_.withName)
@@ -142,9 +142,9 @@ object UpgradesDao {
     * @param factionDo   the faction for the upgrade
     * @param csvUpgrade  the upgrade itself
     * @param ruleType    the current rule type
-    * @return set of [[WeaponDo]]
+    * @return [[List]] of [[WeaponDo]]
     */
-  private def getWithWeapons(upgradeWith: Set[CSVUpgradeWithDTO], factionDo: FactionDo, csvUpgrade: CSVUpgradeDto, ruleType: EUpgradeRuleType): Set[WeaponDo] = {
+  private def getWithWeapons(upgradeWith: List[CSVUpgradeWithDTO], factionDo: FactionDo, csvUpgrade: CSVUpgradeDto, ruleType: EUpgradeRuleType): List[WeaponDo] = {
     // get all the weapons which are used by the option
     val upgradeWeapons = filterUpgradeWithByTypeAndGetNames(upgradeWith, EUpgradeWithType.WEAPON)
     WeaponDao.findWeaponsForCsv(factionDo.name, upgradeWeapons, weaponName => {
@@ -159,9 +159,9 @@ object UpgradesDao {
     * @param factionDo   the faction for the upgrade
     * @param csvUpgrade  the upgrade itself
     * @param ruleType    the current rule type
-    * @return set of [[AbilityWithModifyValueDo]]
+    * @return [[List]] of [[AbilityWithModifyValueDo]]
     */
-  private def getWithAbilities(upgradeWith: Set[CSVUpgradeWithDTO], factionDo: FactionDo, csvUpgrade: CSVUpgradeDto, ruleType: EUpgradeRuleType): Set[AbilityWithModifyValueDo] = {
+  private def getWithAbilities(upgradeWith: List[CSVUpgradeWithDTO], factionDo: FactionDo, csvUpgrade: CSVUpgradeDto, ruleType: EUpgradeRuleType): List[AbilityWithModifyValueDo] = {
     val upgradeAbilitiesName = filterUpgradeWithByTypeAndGetNames(upgradeWith, EUpgradeWithType.ABILITY)
     AbilitiesDao.findAbilitiesForCsv(upgradeAbilitiesName, ability => {
       LOGGER.error(s"Cannot find ability: $ability for upgrade: ${csvUpgrade.name} for rule: $ruleType faction: ${factionDo.name}")
@@ -175,9 +175,9 @@ object UpgradesDao {
     * @param factionDo   the faction for the upgrade
     * @param csvUpgrade  the upgrade itself
     * @param ruleType    the current rule type
-    * @return set of [[ItemDo]]
+    * @return [[List]] of [[ItemDo]]
     */
-  private def getWithItems(upgradeWith: Set[CSVUpgradeWithDTO], factionDo: FactionDo, csvUpgrade: CSVUpgradeDto, ruleType: EUpgradeRuleType): Set[ItemDo] = {
+  private def getWithItems(upgradeWith: List[CSVUpgradeWithDTO], factionDo: FactionDo, csvUpgrade: CSVUpgradeDto, ruleType: EUpgradeRuleType): List[ItemDo] = {
     val upgradeItemNames = filterUpgradeWithByTypeAndGetNames(upgradeWith, EUpgradeWithType.ITEM)
     ItemDao.findItemsForCsv(upgradeItemNames, itemName => {
       LOGGER.error(s"Cannot find item: $itemName for upgrade: ${csvUpgrade.name} for rule: $ruleType faction: ${factionDo.name}")
@@ -191,9 +191,9 @@ object UpgradesDao {
     * @param factionDo   the faction for the upgrade
     * @param csvUpgrade  the upgrade itself
     * @param ruleType    the current rule type
-    * @return set of [[WeaponDo]]
+    * @return [[List]] of [[WeaponDo]]
     */
-  private def collectSubjects(csvSubjects: Set[String], factionDo: FactionDo, csvUpgrade: CSVUpgradeDto, ruleType: EUpgradeRuleType): Set[WeaponDo] = {
+  private def collectSubjects(csvSubjects: List[String], factionDo: FactionDo, csvUpgrade: CSVUpgradeDto, ruleType: EUpgradeRuleType): List[WeaponDo] = {
     // collect the subject weapons
     csvSubjects.flatMap(subject => {
       if (subject.isEmpty) {
@@ -230,9 +230,9 @@ case class UpgradeDo(name: String,
   * @param options  the options the rul provides
   */
 case class UpgradeRuleDo(ruleType: EUpgradeRuleType,
-                         subjects: Set[WeaponDo],
+                         subjects: List[WeaponDo],
                          amount: Int,
-                         options: Set[UpgradeRuleOptionDo])
+                         options: List[UpgradeRuleOptionDo])
 
 /**
   * Options of an upgrade rule
@@ -245,6 +245,6 @@ case class UpgradeRuleDo(ruleType: EUpgradeRuleType,
   */
 case class UpgradeRuleOptionDo(uuid: String,
                                costs: Int,
-                               weapons: Set[WeaponDo],
-                               abilities: Set[AbilityWithModifyValueDo],
-                               items: Set[ItemDo])
+                               weapons: List[WeaponDo],
+                               abilities: List[AbilityWithModifyValueDo],
+                               items: List[ItemDo])

@@ -3,6 +3,7 @@ package service.logic
 import javax.inject.{Inject, Singleton}
 import play.api.Logger
 import service.models._
+import views.html.helper.options
 
 import scala.concurrent.Future
 
@@ -80,7 +81,8 @@ class UpgradeLogic @Inject()(armyLogic: ArmyLogic) {
       val subject = rule.subjects.head
       Some(UpgradeAttachmentDto(subject = armyLogic.weaponDoToDto(subject),
         amount = rule.amount,
-        options = rule.options.map(upgradeOptionDoToDto)))
+        options = rule.options.map(upgradeOptionDoToDto))
+      )
     } else {
       LOGGER.info(s"Cannot use attachment for subject: ${rule.subjects.map(_.linkedName).mkString("/")} it is not equipped by the troop: ${troopDto.name}  ${troopDto.currentWeapons.map(_.linkedName).mkString("/")}")
       None
@@ -109,14 +111,9 @@ class UpgradeLogic @Inject()(armyLogic: ArmyLogic) {
     // check if the rule can be applied to the current troop
     val filteredWeapons = rule
       .subjects
-      .filter(subjectWeapon => troopDto.currentWeapons.exists(troopWeapon => {
-        troopWeapon.linkedName == subjectWeapon.linkedName
-      }))
+      .filter(subjectWeapon => troopDto.basicWeapons.contains(subjectWeapon.linkedName))
 
-    // check if the troop has a replacement set
-    val isSelectedRule = rule.options.exists(ruleOption => troopDto.selectedReplacements.contains(ruleOption.uuid))
-
-    if (filteredWeapons.size != rule.subjects.size && isSelectedRule == false) {
+    if (filteredWeapons.size != rule.subjects.size) {
       LOGGER.info(s"Cannot use ${rule.ruleType} subjects: ${rule.subjects.map(_.linkedName).mkString("/")} are not in the current weapons of troop: ${troopDto.name} ${troopDto.currentWeapons.map(_.linkedName).mkString("/")}")
       None
     } else {
@@ -203,9 +200,9 @@ class UpgradeLogic @Inject()(armyLogic: ArmyLogic) {
   * @param amount   how many may be replaced
   * @param options  the options which can be choose for replacement
   */
-case class UpgradeReplaceDto(subjects: Set[WeaponDto],
+case class UpgradeReplaceDto(subjects: List[WeaponDto],
                              amount: Int,
-                             options: Set[UpgradeOptionDto])
+                             options: List[UpgradeOptionDto])
 
 /**
   * Represents an attachment update the user can replace some stuff with other stuff
@@ -216,7 +213,7 @@ case class UpgradeReplaceDto(subjects: Set[WeaponDto],
   */
 case class UpgradeAttachmentDto(subject: WeaponDto,
                                 amount: Int,
-                                options: Set[UpgradeOptionDto])
+                                options: List[UpgradeOptionDto])
 
 /**
   * Represents a upgrade update the user can replace some stuff with other stuff
@@ -225,7 +222,7 @@ case class UpgradeAttachmentDto(subject: WeaponDto,
   * @param options the options which can be choose for replacement
   */
 case class UpgradeUpgradeDto(amount: Int,
-                             options: Set[UpgradeOptionDto])
+                             options: List[UpgradeOptionDto])
 
 
 /**
@@ -239,9 +236,9 @@ case class UpgradeUpgradeDto(amount: Int,
   */
 case class UpgradeOptionDto(uuid: String,
                             costs: Int,
-                            weapons: Set[WeaponDto],
-                            abilities: Set[AbilityDto],
-                            items: Set[ItemDto])
+                            weapons: List[WeaponDto],
+                            abilities: List[AbilityDto],
+                            items: List[ItemDto])
 
 /**
   * Represents all possible upgrades a troop can have currently

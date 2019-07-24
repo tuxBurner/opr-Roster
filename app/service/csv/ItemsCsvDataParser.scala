@@ -21,7 +21,7 @@ class ItemsCsvDataParser @Inject()(configuration: Configuration) extends CSVData
       .map(info => {
         val name = info._1.get(CSVHeaders.NAME_HEADER).get
         val defense = readCsvLineToIntWithDefault(CSVHeaders.DEFENSE_HEADER, info, 0)
-        val abilities = readCsvLineToSet(CSVHeaders.ABILITIES_HEADER, info)
+        val abilities = readCsvLineToList(CSVHeaders.ABILITIES_HEADER, info)
         CSVItemDto(name = name,
           abilities = abilities,
           defenseModifier = defense)
@@ -37,5 +37,5 @@ class ItemsCsvDataParser @Inject()(configuration: Configuration) extends CSVData
   * @param defenseModifier the defense modifier
   */
 case class CSVItemDto(name: String,
-                      abilities: Set[String],
+                      abilities: List[String],
                       defenseModifier: Int)

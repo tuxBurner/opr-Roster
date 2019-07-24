@@ -83,9 +83,9 @@ object AbilitiesDao {
     *
     * @param abilitiesFromCsv the strings from the csv
     * @param errorLog         the logging callback
-    * @return [[Set]] of [[AbilityWithModifyValueDo]]
+    * @return [[List]] of [[AbilityWithModifyValueDo]]
     */
-  def findAbilitiesForCsv(abilitiesFromCsv: Set[String], errorLog: String => Unit): Set[AbilityWithModifyValueDo] = {
+  def findAbilitiesForCsv(abilitiesFromCsv: List[String], errorLog: String => Unit): List[AbilityWithModifyValueDo] = {
     abilitiesFromCsv.flatMap(
       abilityName => {
         if (abilityName.isEmpty) {

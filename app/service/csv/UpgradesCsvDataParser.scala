@@ -42,7 +42,7 @@ class UpgradesCsvDataParser @Inject()(configuration: Configuration) extends CSVD
         val rulesDto = rules.map(ruleLines => {
           val firstLine = ruleLines(0)
           val ruleName = firstLine._1.get(CSVHeaders.RULE_HEADER).get
-          val subjects = readCsvLineToSet(CSVHeaders.SUBJECTS_HEADER, firstLine)
+          val subjects = readCsvLineToList(CSVHeaders.SUBJECTS_HEADER, firstLine)
           val amount = readCsvLineToIntWithDefault(CSVHeaders.AMOUNT_HEADER, firstLine)
 
           val upgradeWiths = ruleLines.map(ruleLine => {
@@ -51,16 +51,16 @@ class UpgradesCsvDataParser @Inject()(configuration: Configuration) extends CSVD
             val upgradeWith = readCsvLineToList(CSVHeaders.WITH_HEADER, ruleLine)
             val upgradeWithType = readCsvLineToList(CSVHeaders.WITH_TYPE_HEADER, ruleLine)
 
-            val upgradeWithSet: Set[CSVUpgradeWithDTO] = if (upgradeWith.size != upgradeWithType.size) {
+            val upgradeWithSet: List[CSVUpgradeWithDTO] = if (upgradeWith.size != upgradeWithType.size) {
               LOGGER.error(s"The ${CSVHeaders.WITH_HEADER} and ${CSVHeaders.WITH_TYPE_HEADER} at line: ${ruleLine._2} in the $getFileName().csv don't have the same amount of options.")
-              Set.empty
+              List.empty
             } else {
-              upgradeWith.zipWithIndex.map((upgradeWithBlock) => CSVUpgradeWithDTO(withName = upgradeWithBlock._1, withType = upgradeWithType(upgradeWithBlock._2))).toSet
+              upgradeWith.zipWithIndex.map((upgradeWithBlock) => CSVUpgradeWithDTO(withName = upgradeWithBlock._1, withType = upgradeWithType(upgradeWithBlock._2)))
             }
 
             CSVUpgradeOptionDto(costs = costs.get,
               upgradeWith = upgradeWithSet)
-          }).toSet
+          })
 
           CSVUpgradeRuleDto(ruleType = ruleName,
             subjects = subjects,
@@ -81,6 +81,7 @@ class UpgradesCsvDataParser @Inject()(configuration: Configuration) extends CSVD
 
   /**
     * Splits the given list blockwise
+    *
     * @param originalList
     * @param search function which returns true for the block start
     * @tparam A the type parameter to handle
@@ -90,7 +91,8 @@ class UpgradesCsvDataParser @Inject()(configuration: Configuration) extends CSVD
 
     /**
       * Helper for the splitting
-      * @param resultList the list with the blocks to return as the result
+      *
+      * @param resultList   the list with the blocks to return as the result
       * @param leftOverList the list to take the next blocks from
       * @return the list with the blocks
       */
@@ -122,9 +124,10 @@ class UpgradesCsvDataParser @Inject()(configuration: Configuration) extends CSVD
 
 /**
   * An upgrade
-  * @param name the name of the upgrade
+  *
+  * @param name        the name of the upgrade
   * @param factionName the name of the faction the upgrade belongs to
-  * @param rules the rules in the upgrade
+  * @param rules       the rules in the upgrade
   */
 case class CSVUpgradeDto(name: String,
                          factionName: String,
@@ -132,26 +135,29 @@ case class CSVUpgradeDto(name: String,
 
 /**
   * A Rule for the upgrades
+  *
   * @param ruleType the type of the rule
   * @param subjects the subjects to apply the rule on
-  * @param amount how many options may be picked
-  * @param options the options which can be selected
+  * @param amount   how many options may be picked
+  * @param options  the options which can be selected
   */
 case class CSVUpgradeRuleDto(ruleType: String,
-                             subjects: Set[String],
+                             subjects: List[String],
                              amount: Int,
-                             options: Set[CSVUpgradeOptionDto])
+                             options: List[CSVUpgradeOptionDto])
 
 /**
   * An upgrade option
-  * @param costs how much does the upgrade cost
+  *
+  * @param costs       how much does the upgrade cost
   * @param upgradeWith with what can the upgrade be used
   */
 case class CSVUpgradeOptionDto(costs: Int,
-                               upgradeWith: Set[CSVUpgradeWithDTO])
+                               upgradeWith: List[CSVUpgradeWithDTO])
 
 /**
   * Represents an upgrade with
+  *
   * @param withName the name of the item
   * @param withType the type of the item
   */

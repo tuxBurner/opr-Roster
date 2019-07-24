@@ -75,9 +75,9 @@ object WeaponDao {
     * @param factionName the name of the faction to get the weapons for
     * @param weaponsFromCsv the strings from the csv
     * @param errorLog       the logging callback
-    * @return [[Set]] of [[WeaponDo]]
+    * @return [[List]] of [[WeaponDo]]
     */
-  def findWeaponsForCsv(factionName:String,weaponsFromCsv: Set[String], errorLog: (String) => Unit): Set[WeaponDo] = {
+  def findWeaponsForCsv(factionName:String,weaponsFromCsv: List[String], errorLog: (String) => Unit): List[WeaponDo] = {
     weaponsFromCsv.flatMap(weaponName => {
       if (weaponName.isEmpty) {
         None
@@ -117,6 +117,6 @@ case class WeaponDo(name: String,
                     range: Int,
                     attacks: Int,
                     armorPiercing: Int,
-                    abilities: Set[AbilityWithModifyValueDo])
+                    abilities: List[AbilityWithModifyValueDo])
 
 

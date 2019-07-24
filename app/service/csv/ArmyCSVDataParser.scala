@@ -27,8 +27,8 @@ class ArmyCSVDataParser @Inject()(configuration: Configuration) extends CSVDataP
           val size = readCsvLineToInt(CSVHeaders.SIZE_HEADER, info)
           val quality = readCsvLineToInt(CSVHeaders.QUALITY_HEADER, info)
           val defence = readCsvLineToInt(CSVHeaders.DEFENSE_HEADER, info)
-          val defaultEquipment = readCsvLineToSet(CSVHeaders.EQUIPMENT_HEADER, info)
-          val defaultAbilities = readCsvLineToSet(CSVHeaders.ABILITIES_HEADER, info)
+          val defaultEquipment = readCsvLineToList(CSVHeaders.EQUIPMENT_HEADER, info)
+          val defaultAbilities = readCsvLineToList(CSVHeaders.ABILITIES_HEADER, info)
           val upgrades = readCsvLineToSet(CSVHeaders.UPGRADES_HEADER, info)
           val costs = readCsvLineToInt(CSVHeaders.COST_HEADER, info)
 
@@ -88,8 +88,8 @@ case class CSVTroopDto(name: String,
                        size: Int,
                        quality: Int,
                        defense: Int,
-                       defaultEquipment: Set[String],
-                       defaultAbilities: Set[String],
+                       defaultEquipment: List[String],
+                       defaultAbilities: List[String],
                        upgrades: Set[String],
                        costs: Int)
 

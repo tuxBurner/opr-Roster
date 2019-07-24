@@ -239,9 +239,10 @@ class ArmyLogic @Inject()(cache: AsyncCacheApi) {
       basicCosts = troopDo.costs,
       basicQuality = troopDo.quality,
       basicDefense = troopDo.defense,
+      basicWeapons = troopDo.defaultWeapons.map(_.linkedName),
       costs = troopDo.costs,
       currentAbilities = troopDo.defaultAbilities.map(abilityDoToDto),
-      currentItems = Set.empty,
+      currentItems = List.empty,
       currentWeapons = troopDo.defaultWeapons.map(weaponDoToDto),
       possibleUpgrades = troopDo.upgrades
     ))
@@ -396,6 +397,7 @@ case class ArmyDto(factionName: String,
   * @param basicCosts           the initial costs of the troop
   * @param basicQuality         the basic quality stat of the troop
   * @param basicDefense         the basic defense stat of the troop
+  * @param basicWeapons         the names of the basic weapons the troop has
   * @param costs                the current costs value which the troop has after applying all updates to it
   * @param defense              the current defense value which the troop has after applying all updates to it
   * @param shoot                the current shoot value which the troop has after applying all updates to it
@@ -417,15 +419,16 @@ case class TroopDto(uuid: String,
                     basicCosts: Int,
                     basicQuality: Int,
                     basicDefense: Int,
+                    basicWeapons: List[String],
                     costs: Int,
                     defense: Int = 0,
                     shoot: Int = 0,
                     fight: Int = 0,
                     move: Int = 6,
                     sprint: Int = 12,
-                    currentWeapons: Set[WeaponDto],
-                    currentAbilities: Set[AbilityDto],
-                    currentItems: Set[ItemDto],
+                    currentWeapons: List[WeaponDto],
+                    currentAbilities: List[AbilityDto],
+                    currentItems: List[ItemDto],
                     possibleUpgrades: Set[String],
                     selectedReplacements: List[String] = List.empty,
                     selectedAttachments: List[String] = List.empty,
@@ -447,7 +450,7 @@ case class WeaponDto(name: String,
                      range: Int,
                      attacks: Int,
                      armorPiercing: Int,
-                     abilities: Set[AbilityDto])
+                     abilities: List[AbilityDto])
 
 /**
   * Represtents an item
@@ -457,7 +460,7 @@ case class WeaponDto(name: String,
   * @param defenseModifier when [[Some]] how mich does the item modify the defense of the troop
   */
 case class ItemDto(name: String,
-                   abilities: Set[AbilityDto],
+                   abilities: List[AbilityDto],
                    defenseModifier: Int)
 
 /**

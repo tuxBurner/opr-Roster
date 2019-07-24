@@ -109,6 +109,6 @@ case class TroopDo(name: String,
                    quality: Int,
                    defense: Int,
                    costs: Int,
-                   defaultWeapons: Set[WeaponDo],
-                   defaultAbilities: Set[AbilityWithModifyValueDo],
+                   defaultWeapons: List[WeaponDo],
+                   defaultAbilities: List[AbilityWithModifyValueDo],
                    upgrades: Set[String])
