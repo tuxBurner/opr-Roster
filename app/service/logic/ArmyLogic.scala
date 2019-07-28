@@ -239,7 +239,7 @@ class ArmyLogic @Inject()(cache: AsyncCacheApi) {
       basicCosts = troopDo.costs,
       basicQuality = troopDo.quality,
       basicDefense = troopDo.defense,
-      basicWeapons = troopDo.defaultWeapons.map(_.linkedName),
+      defaultWeapons = troopDo.defaultWeapons.map(weaponDoToDto),
       costs = troopDo.costs,
       currentAbilities = troopDo.defaultAbilities.map(abilityDoToDto),
       currentItems = List.empty,
@@ -397,7 +397,7 @@ case class ArmyDto(factionName: String,
   * @param basicCosts           the initial costs of the troop
   * @param basicQuality         the basic quality stat of the troop
   * @param basicDefense         the basic defense stat of the troop
-  * @param basicWeapons         the names of the basic weapons the troop has
+  * @param defaultWeapons         the basic weapons the troop has
   * @param costs                the current costs value which the troop has after applying all updates to it
   * @param defense              the current defense value which the troop has after applying all updates to it
   * @param shoot                the current shoot value which the troop has after applying all updates to it
@@ -419,7 +419,7 @@ case class TroopDto(uuid: String,
                     basicCosts: Int,
                     basicQuality: Int,
                     basicDefense: Int,
-                    basicWeapons: List[String],
+                    defaultWeapons: List[WeaponDto],
                     costs: Int,
                     defense: Int = 0,
                     shoot: Int = 0,

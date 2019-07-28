@@ -50,7 +50,7 @@ class UpgradeLogicSpec extends BasicOprLogicSpec {
       val troopUuid = armyWithTroop.troops.head.uuid
 
       val replacementUUId = "Not Known"
-      val updatedArmy = getFResultDefined(upgradeLogic.setReplacementOnTroop(uuid,troopUuid, replacementUUId))
+      val updatedArmy = getFResultDefined(upgradeLogic.setReplacementOnTroop(uuid, troopUuid, replacementUUId))
 
 
       val notChangedTroop = updatedArmy.troops.head
@@ -67,7 +67,7 @@ class UpgradeLogicSpec extends BasicOprLogicSpec {
       val troopUuid = armyWithTroop.troops.head.uuid
 
       val replacementUUId = "Orc Marauders_A_Replace_Pistol_0_Carbine_5"
-      val updatedArmy = getFResultDefined(upgradeLogic.setReplacementOnTroop(uuid,troopUuid, replacementUUId))
+      val updatedArmy = getFResultDefined(upgradeLogic.setReplacementOnTroop(uuid, troopUuid, replacementUUId))
 
       val changedTroop = updatedArmy.troops.head
       changedTroop.currentWeapons.size mustBe 2
@@ -96,10 +96,10 @@ class UpgradeLogicSpec extends BasicOprLogicSpec {
       val troopUuid = armyWithTroop.troops.head.uuid
 
       val replacementPistolUUId = "Orc Marauders_A_Replace_Pistol_0_Carbine_5"
-      getFResultDefined(upgradeLogic.setReplacementOnTroop(uuid,troopUuid, replacementPistolUUId))
+      getFResultDefined(upgradeLogic.setReplacementOnTroop(uuid, troopUuid, replacementPistolUUId))
 
       val replacementCCWUuid = "Orc Marauders_A_Replace_CCW2_0_Energy Sword_10"
-      val updatedArmy = getFResultDefined(upgradeLogic.setReplacementOnTroop(uuid,troopUuid, replacementCCWUuid))
+      val updatedArmy = getFResultDefined(upgradeLogic.setReplacementOnTroop(uuid, troopUuid, replacementCCWUuid))
 
       val changedTroop = updatedArmy.troops.head
       changedTroop.selectedReplacements.length mustBe 2
@@ -113,9 +113,23 @@ class UpgradeLogicSpec extends BasicOprLogicSpec {
       changedTroop.costs mustBe 30
     }
 
-   // "changing "
+    "changing from one replacement to another works" in {
+      val uuid = UUID.randomUUID().toString
+      getFResultDefined(armyLogic.addNewArmy(uuid, orcMarauderFaction))
+      val armyWithTroop = getFResultDefined(armyLogic.addTroopToArmy(uuid, "Orc"))
 
-    
+      val troopUuid = armyWithTroop.troops.head.uuid
+
+      val replacementPistolUUId = "Orc Marauders_A_Replace_Pistol_0_Carbine_5"
+      getFResultDefined(upgradeLogic.setReplacementOnTroop(uuid, troopUuid, replacementPistolUUId))
+
+
+      val replacePistolUUId2 = "Orc Marauders_A_Replace_Pistol_0_Twin Carbine_10"
+      val changedArmy  = getFResultDefined(upgradeLogic.setReplacementOnTroop(uuid, troopUuid, replacePistolUUId2))
+
+      val changedTroop = changedArmy.troops.head
+      changedTroop.costs mustBe 25
+    }
 
 
   }

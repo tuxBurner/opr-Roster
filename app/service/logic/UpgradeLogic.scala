@@ -101,7 +101,7 @@ class UpgradeLogic @Inject()(armyLogic: ArmyLogic) {
   }
 
   /**
-    * Gets the replace option for the troop when the troop has equiped the weapon combination which matches
+    * Gets the replace option for the troop when the troop has equipped the weapon combination which matches
     *
     * @param troopDto the troop for which the replacement is
     * @param rule     the rule for the attachment
@@ -111,7 +111,7 @@ class UpgradeLogic @Inject()(armyLogic: ArmyLogic) {
     // check if the rule can be applied to the current troop
     val filteredWeapons = rule
       .subjects
-      .filter(subjectWeapon => troopDto.basicWeapons.contains(subjectWeapon.linkedName))
+      .filter(subjectWeapon => troopDto.defaultWeapons.contains(subjectWeapon.linkedName))
 
     if (filteredWeapons.size != rule.subjects.size) {
       LOGGER.info(s"Cannot use ${rule.ruleType} subjects: ${rule.subjects.map(_.linkedName).mkString("/")} are not in the current weapons of troop: ${troopDto.name} ${troopDto.currentWeapons.map(_.linkedName).mkString("/")}")
@@ -148,7 +148,7 @@ class UpgradeLogic @Inject()(armyLogic: ArmyLogic) {
           LOGGER.info(s"Applying replacement: $replaceUuid at troop: $troopUuid")
 
           val troopsWeapon = troop.
-            currentWeapons.flatMap(weapon => {
+            defaultWeapons.flatMap(weapon => {
             if (replacement.subjects.exists(_.linkedName == weapon.linkedName)) {
               None
             } else {
