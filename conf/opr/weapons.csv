@@ -50,11 +50,11 @@ Battle Brothers;Gravity Rifle;18;1;;Rending;
 Battle Brothers;Plasma Rifle;24;1;2;;
 Battle Brothers;Flamethrower;12;6;;;
 Battle Brothers;Fusion Rifle;12;1;4;Deadly(6);
-Battle Brothers;Plasma Canon;36;1;2;Blast(3);
+Battle Brothers;Plasma Cannon;36;1;2;Blast(3);
 Battle Brothers;Missile Launcher HE;48;1;;PickOneEachTurn,Blast(3);Missile Launcher
 Battle Brothers;Missile Launcher AT;48;1;3;PickOneEachTurn,Deadly(3);Missile Launcher
 Battle Brothers;Heavy Fusion Rifle;24;1;4;Deadly(6);
-Battle Brothers;Laser Canon;48;1;4;Deadly(3);
+Battle Brothers;Laser Cannon;48;1;4;Deadly(3);
 Battle Brothers;Shotgun;12;2;;;
 Battle Brothers;Sniper Rifle;36;1;1;Sniper;
 Battle Brothers;2x Energy Claws;;2;1;Rending;
